@@ -12,8 +12,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.TournamentSelection;
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.IFunction;
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.RastriginFunction;
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealVector;
+import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +32,7 @@ public final class RastriginSimpleGA {
         final boolean FORCE_MUTATION       = true;
         final double  SIGMA                = 0.9;
         final boolean USE_ELITISM          = true;
-        final int     MAX_GENERATIONS      = 100;
+        final int     MAX_GENERATIONS      = 100_000;
         final double  DESIRED_FITNESS      = 0;
         final double  DESIRED_PRECISION    = 1e-3;
 
@@ -70,7 +69,7 @@ public final class RastriginSimpleGA {
         Collection<RealVector> initialPopulation = new ArrayList<>();
 
         for (int i = 0; i < populationSize; i++) {
-            RealVector vector = new ArrayRealVector(numberOfComponents);
+            RealVector vector = new RealVector(numberOfComponents);
 
             for (int k = 0; k < numberOfComponents; k++) {
                 vector.setEntry(k, minComponentSize + rand.nextDouble() * (maxComponentSize - minComponentSize));
