@@ -1,2 +1,4 @@
 .idea/
 ecfjava.iml
+out/
+target/
