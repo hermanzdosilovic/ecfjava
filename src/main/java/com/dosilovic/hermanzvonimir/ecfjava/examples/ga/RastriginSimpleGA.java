@@ -1,6 +1,6 @@
 package com.dosilovic.hermanzvonimir.ecfjava.examples.ga;
 
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.ga.IGA;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.ga.IGeneticAlgorithm;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.ga.SimpleGA;
 import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.BLXAlphaCrossover;
 import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.ICrossover;
@@ -49,7 +49,7 @@ public final class RastriginSimpleGA {
         ICrossover<RealVector> crossover = new BLXAlphaCrossover<>(ALPHA);
         IMutation<RealVector> mutation = new RealVectorGaussianMutation<>(MUTATION_PROBABILITY, FORCE_MUTATION, SIGMA);
 
-        IGA<RealVector> geneticAlgorithm = new SimpleGA<>(
+        IGeneticAlgorithm<RealVector> geneticAlgorithm = new SimpleGA<>(
             USE_ELITISM,
             MAX_GENERATIONS,
             DESIRED_FITNESS,

@@ -5,7 +5,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Solution<T> {
+public class Solution<T> implements Comparable<Solution<T>> {
 
     private T representative;
     private double fitness;
@@ -128,5 +128,35 @@ public class Solution<T> {
         }
 
         return currentSecondBestSolution;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Solution<?> solution = (Solution<?>) o;
+
+        return representative != null ?
+            representative.equals(solution.representative) :
+            solution.representative == null;
+    }
+
+    @Override public int hashCode() {
+        return representative != null ? representative.hashCode() : 0;
+    }
+
+    @Override public String toString() {
+        return this.toString();
+    }
+
+    @Override public int compareTo(Solution<T> o) {
+        if (this.fitness < o.fitness) {
+            return -1;
+        } else if (this.fitness > o.fitness) {
+            return 1;
+        }
+        return 0;
     }
 }
