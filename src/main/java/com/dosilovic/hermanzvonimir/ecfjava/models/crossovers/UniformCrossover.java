@@ -11,14 +11,15 @@ public class UniformCrossover<T extends IVector> implements ICrossover<T> {
 
     private static final Random RAND = new Random();
 
-    @SuppressWarnings("unchecked") @Override
+    @SuppressWarnings("unchecked")
+    @Override
     public Collection<Solution<T>> cross(Solution<T> firstParent, Solution<T> secondParent) {
-        T firstParentRepresentative = firstParent.getRepresentative();
+        T firstParentRepresentative  = firstParent.getRepresentative();
         T secondParentRepresentative = secondParent.getRepresentative();
 
-        Collection<Solution<T>> children = new ArrayList<>();
-        T firstChild = (T) firstParentRepresentative.clone();
-        T secondChild = (T) secondParentRepresentative.clone();
+        Collection<Solution<T>> children    = new ArrayList<>();
+        T                       firstChild  = (T) firstParentRepresentative.clone();
+        T                       secondChild = (T) secondParentRepresentative.clone();
 
         children.add(new Solution<>(firstChild));
         children.add(new Solution<>(secondChild));

@@ -8,11 +8,13 @@ public abstract class AbstractCoolingSchedule implements ICoolingSchedule {
         this.initialTemperature = initialTemperature;
     }
 
-    @Override public double getInitialTemperature() {
+    @Override
+    public double getInitialTemperature() {
         return initialTemperature;
     }
 
-    @Override public void setInitialTemperature(double initialTemperature) {
+    @Override
+    public void setInitialTemperature(double initialTemperature) {
         this.initialTemperature = initialTemperature;
     }
 }

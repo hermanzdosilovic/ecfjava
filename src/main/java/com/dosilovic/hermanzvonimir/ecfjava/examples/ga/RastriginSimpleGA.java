@@ -21,10 +21,10 @@ import java.util.Random;
 public final class RastriginSimpleGA {
 
     public static void main(String[] args) {
-        final int     POPULATION_SIZE      = 20;
         final int     NUMBER_OF_COMPONENTS = 30;
         final double  MIN_COMPONENT_SIZE   = -10;
         final double  MAX_COMPONENT_SIZE   = 10;
+        final int     POPULATION_SIZE      = 20;
         final int     TOURNAMENT_SIZE      = 3;
         final boolean ALLOW_REPEAT         = false;
         final double  ALPHA                = 0.9;
@@ -36,18 +36,14 @@ public final class RastriginSimpleGA {
         final double  DESIRED_FITNESS      = 0;
         final double  DESIRED_PRECISION    = 1e-3;
 
-        Collection<RealVector> initialPopulation = createInitialPopulation(
-            POPULATION_SIZE,
-            NUMBER_OF_COMPONENTS,
-            MIN_COMPONENT_SIZE,
-            MAX_COMPONENT_SIZE
-        );
-
-        IFunction<RealVector> function = new RastriginFunction<>();
-        IProblem<RealVector> problem = new FunctionMinimizationProblem<>(function);
+        IProblem<RealVector>   problem   = new FunctionMinimizationProblem<>(new RastriginFunction<>());
         ISelection<RealVector> selection = new TournamentSelection<>(TOURNAMENT_SIZE, ALLOW_REPEAT);
         ICrossover<RealVector> crossover = new BLXAlphaCrossover<>(ALPHA);
-        IMutation<RealVector> mutation = new RealVectorGaussianMutation<>(MUTATION_PROBABILITY, FORCE_MUTATION, SIGMA);
+        IMutation<RealVector>  mutation  = new RealVectorGaussianMutation<>(
+            MUTATION_PROBABILITY,
+            FORCE_MUTATION,
+            SIGMA
+        );
 
         IGeneticAlgorithm<RealVector> geneticAlgorithm = new SimpleGA<>(
             USE_ELITISM,
@@ -60,12 +56,21 @@ public final class RastriginSimpleGA {
             mutation
         );
 
-        geneticAlgorithm.run(initialPopulation);
+        geneticAlgorithm.run(createInitialPopulation(
+            POPULATION_SIZE,
+            NUMBER_OF_COMPONENTS,
+            MIN_COMPONENT_SIZE,
+            MAX_COMPONENT_SIZE
+        ));
     }
 
-    public static Collection<RealVector> createInitialPopulation(int populationSize, int numberOfComponents,
-        double minComponentSize, double maxComponentSize) {
-        Random rand = new Random();
+    public static Collection<RealVector> createInitialPopulation(
+        int populationSize,
+        int numberOfComponents,
+        double minComponentSize,
+        double maxComponentSize
+    ) {
+        Random                 rand              = new Random();
         Collection<RealVector> initialPopulation = new ArrayList<>();
 
         for (int i = 0; i < populationSize; i++) {

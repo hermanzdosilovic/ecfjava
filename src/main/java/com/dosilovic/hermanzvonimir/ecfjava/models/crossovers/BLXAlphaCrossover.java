@@ -17,7 +17,7 @@ public class BLXAlphaCrossover<T extends RealVector> implements ICrossover<T> {
     }
 
     @Override public Collection<Solution<T>> cross(Solution<T> firstParent, Solution<T> secondParent) {
-        T firstRepresentative = firstParent.getRepresentative();
+        T firstRepresentative  = firstParent.getRepresentative();
         T secondRepresentative = secondParent.getRepresentative();
 
         T child = (T) firstRepresentative.copy();

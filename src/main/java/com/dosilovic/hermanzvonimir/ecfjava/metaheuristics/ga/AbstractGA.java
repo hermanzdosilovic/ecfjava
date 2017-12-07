@@ -14,19 +14,27 @@ import java.util.Date;
 public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
 
     protected boolean useElitism;
-    protected int maxGenerations;
-    protected double desiredFitness;
-    protected double desiredPrecision;
+    protected int     maxGenerations;
+    protected double  desiredFitness;
+    protected double  desiredPrecision;
 
-    protected IProblem<T> problem;
+    protected IProblem<T>   problem;
     protected ISelection<T> selection;
     protected ICrossover<T> crossover;
-    protected IMutation<T> mutation;
+    protected IMutation<T>  mutation;
 
     protected Collection<Solution<T>> initialPopulation;
 
-    public AbstractGA(boolean useElitism, int maxGenerations, double desiredFitness, double desiredPrecision,
-        IProblem<T> problem, ISelection<T> selection, ICrossover<T> crossover, IMutation<T> mutation) {
+    public AbstractGA(
+        boolean useElitism,
+        int maxGenerations,
+        double desiredFitness,
+        double desiredPrecision,
+        IProblem<T> problem,
+        ISelection<T> selection,
+        ICrossover<T> crossover,
+        IMutation<T> mutation
+    ) {
         this.useElitism = useElitism;
         this.maxGenerations = maxGenerations;
         this.desiredFitness = desiredFitness;
@@ -44,38 +52,44 @@ public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
         }
     }
 
-    @Override public T run(Collection<T> initialPopulation) {
+    @Override
+    public T run(Collection<T> initialPopulation) {
         setInitialPopulation(initialPopulation);
         return run();
     }
 
-    @Override public T run() {
+    @Override
+    public T run() {
         long startTime = System.nanoTime();
 
         if (initialPopulation == null) {
-            throw new IllegalStateException("no initial population");
+            throw new IllegalStateException("No initial population");
         }
 
         Collection<Solution<T>> currentPopulation = initialPopulation;
-        Solution<T> bestSolution;
+        Solution<T>             bestSolution;
 
         int generation;
         for (generation = 1; generation <= maxGenerations; generation++) {
             Solution.evaluateFitness(currentPopulation, problem);
             bestSolution = Solution.findBest(currentPopulation);
 
-            System.err.printf("Generation #%d (%s):\n\tbestFitness = %f\n\n", generation, new Date(),
-                bestSolution.getFitness());
+            System.err.printf(
+                "Generation #%d (%s):\n\tbestFitness = %f\n\n",
+                generation,
+                new Date(),
+                bestSolution.getFitness()
+            );
 
             if (Math.abs(bestSolution.getFitness() - desiredFitness) <= desiredPrecision) {
-                System.err.println("Reached desired fitness.");
+                System.err.println("Reached desired fitness.\n");
                 break;
             }
 
             currentPopulation = createNextPopulation(currentPopulation, bestSolution);
 
             if (generation == maxGenerations) {
-                System.err.println("Max generations reached.");
+                System.err.println("Max generations reached.\n");
                 break;
             }
         }
@@ -83,18 +97,25 @@ public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
         Solution.evaluateFitness(currentPopulation, problem);
         bestSolution = Solution.findBest(currentPopulation);
 
-        long stopTime = System.nanoTime();
+        long     stopTime = System.nanoTime();
         Duration duration = Duration.ofNanos(stopTime - startTime);
 
-        System.err.printf("\nSolution: %s\nFitness: %f\n", bestSolution.getRepresentative(), bestSolution.getFitness());
+        System.err.printf("Solution: %s\nFitness: %f\n", bestSolution.getRepresentative(), bestSolution.getFitness());
         System.err.printf("Generation: #%d\n", generation);
-        System.err.printf("Time: %02d:%02d:%02d.%03d\n\n", duration.toHoursPart(), duration.toMinutesPart(),
-            duration.toSecondsPart(), duration.toMillisPart());
+        System.err.printf(
+            "Time: %02d:%02d:%02d.%03d\n\n",
+            duration.toHoursPart(),
+            duration.toMinutesPart(),
+            duration.toSecondsPart(),
+            duration.toMillisPart()
+        );
         System.err.flush();
 
         return bestSolution.getRepresentative();
     }
 
-    protected abstract Collection<Solution<T>> createNextPopulation(Collection<Solution<T>> currentPopulation,
-        Solution<T> bestSolution);
+    protected abstract Collection<Solution<T>> createNextPopulation(
+        Collection<Solution<T>> currentPopulation,
+        Solution<T> bestSolution
+    );
 }

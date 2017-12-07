@@ -10,11 +10,13 @@ public class FunctionMinimizationProblem<T> implements IProblem<T> {
         this.function = function;
     }
 
-    @Override public double fitness(T individual) {
+    @Override
+    public double fitness(T individual) {
         return -1.0 * penalty(individual);
     }
 
-    @Override public double penalty(T individual) {
+    @Override
+    public double penalty(T individual) {
         return function.getValue(individual);
     }
 }

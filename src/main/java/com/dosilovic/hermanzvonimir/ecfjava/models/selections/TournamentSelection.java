@@ -6,7 +6,7 @@ import java.util.*;
 
 public class TournamentSelection<T> implements ISelection<T> {
 
-    private int size;
+    private int     size;
     private boolean allowRepeat;
     private static final Random RAND = new Random();
 
@@ -15,13 +15,15 @@ public class TournamentSelection<T> implements ISelection<T> {
         this.allowRepeat = allowRepeat;
     }
 
-    @Override public Solution<T> select(Collection<Solution<T>> population) {
+    @Override
+    public Solution<T> select(Collection<Solution<T>> population) {
         List<Solution<T>> tournamentCandidates = new LinkedList<>(population);
-        List<Solution<T>> competitors = new ArrayList<>(size);
+        List<Solution<T>> competitors          = new ArrayList<>(size);
 
         while (competitors.size() < size && tournamentCandidates.size() != 0) {
             int index = RAND.nextInt(tournamentCandidates.size());
             competitors.add(tournamentCandidates.get(index));
+
             if (!allowRepeat) {
                 tournamentCandidates.remove(index);
             }

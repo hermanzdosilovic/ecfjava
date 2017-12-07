@@ -6,7 +6,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.GeometricC
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.ICrossover;
 import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.UniformCrossover;
-import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.BitVectorStohasticMutation;
+import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.BitVectorStochasticMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.MaxOnesProblem;
@@ -20,8 +20,8 @@ import java.util.Collection;
 public class MaxOnesSimpleOSGA {
 
     public static void main(String[] args) {
-        final int     POPULATION_SIZE        = 80;
         final int     NUMBER_OF_COMPONENTS   = 100;
+        final int     POPULATION_SIZE        = 80;
         final int     TOURNAMENT_SIZE        = 3;
         final boolean ALLOW_REPEAT           = false;
         final double  MUTATION_PROBABILITY   = 0.1;
@@ -30,18 +30,16 @@ public class MaxOnesSimpleOSGA {
         final int     MAX_GENERATIONS        = 1000;
         final double  DESIRED_FITNESS        = 1.0;
         final double  DESIRED_PRECISION      = 1e-3;
-        final double  MAX_SELECTION_PRESSURE = 1000_000;
+        final double  MAX_SELECTION_PRESSURE = 100_000;
         final double  MIN_SUCCESS_RATIO      = 0.6;
         final double  MAX_SUCCESS_RATIO      = 1;
         final double  MIN_COMPARISON_FACTOR  = 0.1;
         final double  MAX_COMPARISON_FACTOR  = 1;
 
-        Collection<BitVector> initialPopulation = createInitialPopulation(POPULATION_SIZE, NUMBER_OF_COMPONENTS);
-
         IProblem<BitVector>   problem   = new MaxOnesProblem();
         ISelection<BitVector> selection = new TournamentSelection<>(TOURNAMENT_SIZE, ALLOW_REPEAT);
         ICrossover<BitVector> crossover = new UniformCrossover<>();
-        IMutation<BitVector>  mutation  = new BitVectorStohasticMutation<>(MUTATION_PROBABILITY, FORCE_MUTATION);
+        IMutation<BitVector>  mutation  = new BitVectorStochasticMutation<>(MUTATION_PROBABILITY, FORCE_MUTATION);
 
         ICoolingSchedule successRatioSchedule = new GeometricCoolingSchedule(
             MAX_GENERATIONS,
@@ -68,7 +66,7 @@ public class MaxOnesSimpleOSGA {
             mutation
         );
 
-        geneticAlgorithm.run(initialPopulation);
+        geneticAlgorithm.run(createInitialPopulation(POPULATION_SIZE, NUMBER_OF_COMPONENTS));
     }
 
     private static Collection<BitVector> createInitialPopulation(int populationSize, int numberOfComponents) {

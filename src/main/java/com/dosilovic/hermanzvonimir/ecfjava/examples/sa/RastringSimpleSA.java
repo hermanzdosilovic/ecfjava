@@ -30,23 +30,38 @@ public final class RastringSimpleSA {
         final double  DESIRED_PENALTY      = 0;
         final double  DESIRED_PRECISION    = 1e-3;
 
-        IFunction<RealVector> function = new RastriginFunction<>();
-        IProblem<RealVector> problem = new FunctionMinimizationProblem<>(function);
+        IProblem<RealVector>  problem  = new FunctionMinimizationProblem<>(new RastriginFunction<>());
         IMutation<RealVector> mutation = new RealVectorGaussianMutation<>(MUTATION_PROBABILITY, FORCE_MUTATION, SIGMA);
-        ICoolingSchedule outerCoolingSchedule =
-            new GeometricCoolingSchedule(OUTER_ITERATIONS, OUTER_INITIAL_TEMP, OUTER_FINAL_TEMP);
-        ICoolingSchedule innerCoolingSchedule = new GeometricCoolingSchedule(INNER_ITERATIONS, 0, 0);
 
-        ISimulatedAnnealing<RealVector> simulatedAnnealing =
-            new SimpleSA<>(DESIRED_PENALTY, DESIRED_PRECISION, problem, mutation, outerCoolingSchedule,
-                innerCoolingSchedule);
+        ICoolingSchedule outerCoolingSchedule = new GeometricCoolingSchedule(
+            OUTER_ITERATIONS,
+            OUTER_INITIAL_TEMP,
+            OUTER_FINAL_TEMP
+        );
+        ICoolingSchedule innerCoolingSchedule = new GeometricCoolingSchedule(
+            INNER_ITERATIONS, // we just want INNER_ITERATIONS to happen
+            0,                // don't care for this example
+            0                 // don't care for this example
+        );
+
+        ISimulatedAnnealing<RealVector> simulatedAnnealing = new SimpleSA<>(
+            DESIRED_PENALTY,
+            DESIRED_PRECISION,
+            problem,
+            mutation,
+            outerCoolingSchedule,
+            innerCoolingSchedule
+        );
 
         simulatedAnnealing.run(createInitialSolution(NUMBER_OF_COMPONENTS, MIN_COMPONENT_SIZE, MAX_COMPONENT_SIZE));
     }
 
-    public static RealVector createInitialSolution(int numberOfComponents, double minComponentSize,
-        double maxComponentSize) {
-        Random rand = new Random();
+    public static RealVector createInitialSolution(
+        int numberOfComponents,
+        double minComponentSize,
+        double maxComponentSize
+    ) {
+        Random     rand   = new Random();
         RealVector vector = new RealVector(numberOfComponents);
 
         for (int k = 0; k < numberOfComponents; k++) {

@@ -11,13 +11,33 @@ import java.util.Collection;
 
 public class SimpleGA<T> extends AbstractGA<T> {
 
-    public SimpleGA(boolean useElitism, int maxGenerations, double desiredFitness, double desiredPrecision,
-        IProblem<T> problem, ISelection<T> selection, ICrossover<T> crossover, IMutation<T> mutation) {
-        super(useElitism, maxGenerations, desiredFitness, desiredPrecision, problem, selection, crossover, mutation);
+    public SimpleGA(
+        boolean useElitism,
+        int maxGenerations,
+        double desiredFitness,
+        double desiredPrecision,
+        IProblem<T> problem,
+        ISelection<T> selection,
+        ICrossover<T> crossover,
+        IMutation<T> mutation
+    ) {
+        super(
+            useElitism,
+            maxGenerations,
+            desiredFitness,
+            desiredPrecision,
+            problem,
+            selection,
+            crossover,
+            mutation
+        );
     }
 
-    @Override protected Collection<Solution<T>> createNextPopulation(Collection<Solution<T>> currentPopulation,
-        Solution<T> bestSolution) {
+    @Override
+    protected Collection<Solution<T>> createNextPopulation(
+        Collection<Solution<T>> currentPopulation,
+        Solution<T> bestSolution
+    ) {
         Collection<Solution<T>> nextPopulation = new ArrayList<>(currentPopulation.size());
 
         if (useElitism) {
@@ -26,10 +46,10 @@ public class SimpleGA<T> extends AbstractGA<T> {
         }
 
         while (nextPopulation.size() < currentPopulation.size()) {
-            Solution<T> firstParent = selection.select(currentPopulation);
+            Solution<T> firstParent  = selection.select(currentPopulation);
             Solution<T> secondParent = selection.select(currentPopulation);
 
-            Collection<Solution<T>> children = crossover.cross(firstParent, secondParent);
+            Collection<Solution<T>> children        = crossover.cross(firstParent, secondParent);
             Collection<Solution<T>> mutatedChildren = new ArrayList<>(children.size());
 
             for (Solution<T> child : children) {

@@ -7,9 +7,9 @@ import java.util.Collection;
 
 public class Solution<T> implements Comparable<Solution<T>> {
 
-    private T representative;
-    private double fitness;
-    private double penalty;
+    private T       representative;
+    private double  fitness;
+    private double  penalty;
     private boolean hasFitness;
     private boolean hasPenalty;
 
@@ -60,8 +60,10 @@ public class Solution<T> implements Comparable<Solution<T>> {
         evaluateFitness(problem, false);
     }
 
-    public static <T> void evaluateFitness(Collection<Solution<T>> solutions, IProblem<T> problem,
-        boolean updateIfHasFitness) {
+    public static <T> void evaluateFitness(
+        Collection<Solution<T>> solutions, IProblem<T> problem,
+        boolean updateIfHasFitness
+    ) {
         for (Solution<T> solution : solutions) {
             solution.evaluateFitness(problem, updateIfHasFitness);
         }
@@ -82,8 +84,10 @@ public class Solution<T> implements Comparable<Solution<T>> {
         evaluatePenalty(problem, false);
     }
 
-    public static <T> void evaluatePenalty(Collection<Solution<T>> solutions, IProblem<T> problem,
-        boolean updateIfHasPenalty) {
+    public static <T> void evaluatePenalty(
+        Collection<Solution<T>> solutions, IProblem<T> problem,
+        boolean updateIfHasPenalty
+    ) {
         for (Solution<T> solution : solutions) {
             solution.evaluatePenalty(problem, updateIfHasPenalty);
         }
@@ -114,7 +118,7 @@ public class Solution<T> implements Comparable<Solution<T>> {
     }
 
     public static <T> Solution<T> findSecondBest(Collection<Solution<T>> solutions) {
-        Solution<T> currentBestSolution = null;
+        Solution<T> currentBestSolution       = null;
         Solution<T> currentSecondBestSolution = null;
 
         for (Solution<T> solution : solutions) {
@@ -130,28 +134,34 @@ public class Solution<T> implements Comparable<Solution<T>> {
         return currentSecondBestSolution;
     }
 
-    @Override public boolean equals(Object o) {
-        if (this == o)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         Solution<?> solution = (Solution<?>) o;
 
         return representative != null ?
-            representative.equals(solution.representative) :
-            solution.representative == null;
+               representative.equals(solution.representative) :
+               solution.representative == null;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return representative != null ? representative.hashCode() : 0;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return this.toString();
     }
 
-    @Override public int compareTo(Solution<T> o) {
+    @Override
+    public int compareTo(Solution<T> o) {
         if (this.fitness < o.fitness) {
             return -1;
         } else if (this.fitness > o.fitness) {

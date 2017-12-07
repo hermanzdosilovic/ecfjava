@@ -24,16 +24,18 @@ public class SimpleOSGA<T> extends AbstractOSGA<T> {
         ICrossover<T> crossover,
         IMutation<T> mutation
     ) {
-        super(useElitism, maxGenerations,
-              desiredFitness,
-              desiredPrecision,
-              maxSelectionPressure,
-              successRatioSchedule,
-              comparisonFactorSchedule,
-              problem,
-              selection,
-              crossover,
-              mutation
+        super(
+            useElitism,
+            maxGenerations,
+            desiredFitness,
+            desiredPrecision,
+            maxSelectionPressure,
+            successRatioSchedule,
+            comparisonFactorSchedule,
+            problem,
+            selection,
+            crossover,
+            mutation
         );
     }
 
@@ -92,22 +94,23 @@ public class SimpleOSGA<T> extends AbstractOSGA<T> {
     protected Collection<Solution<T>> createNextPopulation(
         Collection<Solution<T>> currentPopulation,
         Collection<Solution<T>> successfulPopulation,
-        List<Solution<T>> unsuccessfulPopulation,
+        Collection<Solution<T>> unsuccessfulPopulation,
         Solution<T> bestSolution
     ) {
-        Collection<Solution<T>> nextPopulation = new ArrayList<>(successfulPopulation);
-        unsuccessfulPopulation.sort(null);
+        Collection<Solution<T>> nextPopulation             = new ArrayList<>(successfulPopulation);
+        List<Solution<T>>       unsuccessfulPopulationList = new ArrayList<>(unsuccessfulPopulation);
+        unsuccessfulPopulationList.sort(null);
 
         if (useElitism) {
             nextPopulation.add(bestSolution);
             nextPopulation.add(Solution.findSecondBest(currentPopulation));
         }
 
-        for (int i = unsuccessfulPopulation.size() - 1;
+        for (int i = unsuccessfulPopulationList.size() - 1;
              i >= 0 && nextPopulation.size() < currentPopulation.size();
              i--
             ) {
-            nextPopulation.add(unsuccessfulPopulation.get(i));
+            nextPopulation.add(unsuccessfulPopulationList.get(i));
         }
 
         while (nextPopulation.size() < currentPopulation.size()) {

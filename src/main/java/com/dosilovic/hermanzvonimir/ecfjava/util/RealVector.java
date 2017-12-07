@@ -16,19 +16,23 @@ public class RealVector extends ArrayRealVector implements IVector<Double> {
         super(vector.toArray());
     }
 
-    @Override public Double getValue(int index) {
+    @Override
+    public Double getValue(int index) {
         return getEntry(index);
     }
 
-    @Override public void setValue(int index, Double value) {
+    @Override
+    public void setValue(int index, Double value) {
         setEntry(index, value);
     }
 
-    @Override public int getSize() {
+    @Override
+    public int getSize() {
         return getDimension();
     }
 
-    @Override public RealVector clone() {
+    @Override
+    public RealVector clone() {
         return new RealVector(this);
     }
 }

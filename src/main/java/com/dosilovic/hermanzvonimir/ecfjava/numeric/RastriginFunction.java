@@ -4,8 +4,9 @@ import org.apache.commons.math3.linear.RealVector;
 
 public class RastriginFunction<T extends RealVector> implements IFunction<T> {
 
-    @Override public double getValue(T point) {
-        int D = point.getDimension();
+    @Override
+    public double getValue(T point) {
+        int    D = point.getDimension();
         double x;
 
         double value = 10 * D;
