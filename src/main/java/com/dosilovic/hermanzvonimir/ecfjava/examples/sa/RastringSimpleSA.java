@@ -8,7 +8,6 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.RealVectorGaussianMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.FunctionMinimizationProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.numeric.IFunction;
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.RastriginFunction;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 
@@ -18,8 +17,8 @@ public final class RastringSimpleSA {
 
     public static void main(String[] args) {
         final int     NUMBER_OF_COMPONENTS = 30;
-        final double  MIN_COMPONENT_SIZE   = -10;
-        final double  MAX_COMPONENT_SIZE   = 10;
+        final double  MIN_COMPONENT_VALUE  = -10;
+        final double  MAX_COMPONENT_VALUE  = 10;
         final int     OUTER_ITERATIONS     = 4000;
         final double  OUTER_INITIAL_TEMP   = 1000;
         final double  OUTER_FINAL_TEMP     = 1e-4;
@@ -53,21 +52,6 @@ public final class RastringSimpleSA {
             innerCoolingSchedule
         );
 
-        simulatedAnnealing.run(createInitialSolution(NUMBER_OF_COMPONENTS, MIN_COMPONENT_SIZE, MAX_COMPONENT_SIZE));
-    }
-
-    public static RealVector createInitialSolution(
-        int numberOfComponents,
-        double minComponentSize,
-        double maxComponentSize
-    ) {
-        Random     rand   = new Random();
-        RealVector vector = new RealVector(numberOfComponents);
-
-        for (int k = 0; k < numberOfComponents; k++) {
-            vector.setEntry(k, minComponentSize + rand.nextDouble() * (maxComponentSize - minComponentSize));
-        }
-
-        return vector;
+        simulatedAnnealing.run(new RealVector(NUMBER_OF_COMPONENTS, MIN_COMPONENT_VALUE, MAX_COMPONENT_VALUE));
     }
 }

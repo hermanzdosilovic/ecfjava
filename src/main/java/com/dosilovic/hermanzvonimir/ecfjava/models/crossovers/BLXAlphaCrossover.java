@@ -1,7 +1,7 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.crossovers;
 
+import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
-import org.apache.commons.math3.linear.RealVector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +16,13 @@ public class BLXAlphaCrossover<T extends RealVector> implements ICrossover<T> {
         this.alpha = alpha;
     }
 
-    @Override public Collection<Solution<T>> cross(Solution<T> firstParent, Solution<T> secondParent) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<Solution<T>> cross(Solution<T> firstParent, Solution<T> secondParent) {
         T firstRepresentative  = firstParent.getRepresentative();
         T secondRepresentative = secondParent.getRepresentative();
 
-        T child = (T) firstRepresentative.copy();
+        T child = (T) firstRepresentative.clone();
 
         double cmin;
         double cmax;

@@ -1,7 +1,7 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.mutations;
 
+import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
-import org.apache.commons.math3.linear.RealVector;
 
 import java.util.Random;
 
@@ -10,6 +10,7 @@ public class RealVectorGaussianMutation<T extends RealVector> implements IMutati
     private double   mutationProbability;
     private double[] sigma;
     private boolean  forceMutation;
+
     private static final Random RAND = new Random();
 
     public RealVectorGaussianMutation(double mutationProbability, boolean forceMutation, double... sigma) {
@@ -18,10 +19,11 @@ public class RealVectorGaussianMutation<T extends RealVector> implements IMutati
         this.forceMutation = forceMutation;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Solution<T> mutate(Solution<T> individual) {
         T anteMutant = individual.getRepresentative();
-        T postMutant = (T) anteMutant.copy();
+        T postMutant = (T) anteMutant.clone();
 
         boolean mutationHappened = false;
         int     i;

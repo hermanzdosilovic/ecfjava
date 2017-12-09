@@ -10,20 +10,15 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.problems.FunctionMinimization
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.TournamentSelection;
-import com.dosilovic.hermanzvonimir.ecfjava.numeric.IFunction;
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.RastriginFunction;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Random;
 
 public final class RastriginSimpleGA {
 
     public static void main(String[] args) {
         final int     NUMBER_OF_COMPONENTS = 30;
-        final double  MIN_COMPONENT_SIZE   = -10;
-        final double  MAX_COMPONENT_SIZE   = 10;
+        final double  MIN_COMPONENT_VALUE  = -10;
+        final double  MAX_COMPONENT_VALUE  = 10;
         final int     POPULATION_SIZE      = 20;
         final int     TOURNAMENT_SIZE      = 3;
         final boolean ALLOW_REPEAT         = false;
@@ -56,33 +51,11 @@ public final class RastriginSimpleGA {
             mutation
         );
 
-        geneticAlgorithm.run(createInitialPopulation(
+        geneticAlgorithm.run(RealVector.createCollection(
             POPULATION_SIZE,
             NUMBER_OF_COMPONENTS,
-            MIN_COMPONENT_SIZE,
-            MAX_COMPONENT_SIZE
+            MIN_COMPONENT_VALUE,
+            MAX_COMPONENT_VALUE
         ));
-    }
-
-    public static Collection<RealVector> createInitialPopulation(
-        int populationSize,
-        int numberOfComponents,
-        double minComponentSize,
-        double maxComponentSize
-    ) {
-        Random                 rand              = new Random();
-        Collection<RealVector> initialPopulation = new ArrayList<>();
-
-        for (int i = 0; i < populationSize; i++) {
-            RealVector vector = new RealVector(numberOfComponents);
-
-            for (int k = 0; k < numberOfComponents; k++) {
-                vector.setEntry(k, minComponentSize + rand.nextDouble() * (maxComponentSize - minComponentSize));
-            }
-
-            initialPopulation.add(vector);
-        }
-
-        return initialPopulation;
     }
 }

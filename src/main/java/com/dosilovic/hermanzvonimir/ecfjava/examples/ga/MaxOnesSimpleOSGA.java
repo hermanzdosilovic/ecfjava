@@ -66,16 +66,6 @@ public class MaxOnesSimpleOSGA {
             mutation
         );
 
-        geneticAlgorithm.run(createInitialPopulation(POPULATION_SIZE, NUMBER_OF_COMPONENTS));
-    }
-
-    private static Collection<BitVector> createInitialPopulation(int populationSize, int numberOfComponents) {
-        Collection<BitVector> initialPopulation = new ArrayList<>();
-
-        for (int i = 0; i < populationSize; i++) {
-            initialPopulation.add(new BitVector(numberOfComponents));
-        }
-
-        return initialPopulation;
+        geneticAlgorithm.run(BitVector.createCollection(POPULATION_SIZE, NUMBER_OF_COMPONENTS));
     }
 }

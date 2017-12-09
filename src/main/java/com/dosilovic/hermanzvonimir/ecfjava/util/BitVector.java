@@ -1,21 +1,37 @@
 package com.dosilovic.hermanzvonimir.ecfjava.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
+
 public class BitVector implements IVector<Boolean> {
 
     private boolean[] bits;
     private int       cardinality;
 
+    private static final Random RAND = new Random();
+
     public BitVector(int size) {
         bits = new boolean[size];
+    }
+
+    public BitVector(boolean... bits) {
+        this.bits = bits.clone();
+        countNumberOfSetBits();
     }
 
     public BitVector(BitVector bitVector) {
         this(bitVector.bits);
     }
 
-    public BitVector(boolean... bits) {
-        this.bits = bits.clone();
-        countNumberOfSetBits();
+    public BitVector(int size, boolean setBitsAtRandom) {
+        this(size);
+        if (!setBitsAtRandom) {
+            return;
+        }
+        for (int i = 0; i < size; i++) {
+            setValue(i, RAND.nextBoolean());
+        }
     }
 
     @Override
@@ -73,5 +89,21 @@ public class BitVector implements IVector<Boolean> {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    public static Collection<BitVector> createCollection(int collectionSize, int vectorSize) {
+        return createCollection(collectionSize, vectorSize, false);
+    }
+
+    public static Collection<BitVector> createCollection(
+        int collectionSize,
+        int vectorSize,
+        boolean setBitsAtRandom
+    ) {
+        Collection<BitVector> collection = new ArrayList<>(collectionSize);
+        for (int i = 0; i < collectionSize; i++) {
+            collection.add(new BitVector(vectorSize, setBitsAtRandom));
+        }
+        return collection;
     }
 }

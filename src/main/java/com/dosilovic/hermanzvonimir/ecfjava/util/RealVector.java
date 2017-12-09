@@ -2,7 +2,13 @@ package com.dosilovic.hermanzvonimir.ecfjava.util;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
+
 public class RealVector extends ArrayRealVector implements IVector<Double> {
+
+    private static final Random RAND = new Random();
 
     public RealVector(int size) {
         super(size);
@@ -14,6 +20,13 @@ public class RealVector extends ArrayRealVector implements IVector<Double> {
 
     public RealVector(RealVector vector) {
         super(vector.toArray());
+    }
+
+    public RealVector(int size, double minComponentValue, double maxComponentValue) {
+        this(size);
+        for (int i = 0; i < size; i++) {
+            setEntry(i, minComponentValue + RAND.nextDouble() * (maxComponentValue - minComponentValue));
+        }
     }
 
     @Override
@@ -31,8 +44,28 @@ public class RealVector extends ArrayRealVector implements IVector<Double> {
         return getDimension();
     }
 
-    @Override
-    public RealVector clone() {
+    @Override public Object clone() {
         return new RealVector(this);
+    }
+
+    public static Collection<RealVector> createCollection(int collectionSize, int vectorSize) {
+        Collection<RealVector> collection = new ArrayList<>(collectionSize);
+        for (int i = 0; i < collectionSize; i++) {
+            collection.add(new RealVector(vectorSize));
+        }
+        return collection;
+    }
+
+    public static Collection<RealVector> createCollection(
+        int collectionSize,
+        int vectorSize,
+        double minComponentValue,
+        double maxComponentValue
+    ) {
+        Collection<RealVector> collection = new ArrayList<>(collectionSize);
+        for (int i = 0; i < collectionSize; i++) {
+            collection.add(new RealVector(vectorSize, minComponentValue, maxComponentValue));
+        }
+        return collection;
     }
 }
