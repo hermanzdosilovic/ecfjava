@@ -65,7 +65,7 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
         currentSolution.evaluatePenalty(problem);
 
         for (double outerTemperature : outerCoolingSchedule) {
-            currentSolution = onOuterTemperatureStart(currentSolution, bestSolution, outerTemperature);
+            currentSolution = onOuterTemperatureStart(currentSolution, outerTemperature);
             notifyObservers(currentSolution);
 
             System.err.printf(
@@ -82,7 +82,6 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
             for (double innerTemperature : innerCoolingSchedule) {
                 currentSolution = onInnerTemperatureStart(
                     currentSolution,
-                    bestSolution,
                     outerTemperature,
                     innerTemperature
                 );
@@ -93,7 +92,6 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
                 currentSolution = selectNextSolution(
                     currentSolution,
                     neighborSolution,
-                    bestSolution,
                     outerTemperature,
                     innerTemperature
                 );
@@ -131,13 +129,11 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
 
     protected abstract Solution<T> onOuterTemperatureStart(
         Solution<T> currentSolution,
-        Solution<T> bestSolution,
         double outerTemperature
     );
 
     protected abstract Solution<T> onInnerTemperatureStart(
         Solution<T> currentSolution,
-        Solution<T> bestSolution,
         double outerTemperature,
         double innerTemperature
     );
@@ -145,7 +141,6 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
     protected abstract Solution<T> selectNextSolution(
         Solution<T> currentSolution,
         Solution<T> nextSolution,
-        Solution<T> bestSolution,
         double outerTemperature,
         double innerTemperature
     );

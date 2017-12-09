@@ -12,7 +12,7 @@ public class SimpleSA<T> extends AbstractSA<T> {
     private static final Random RAND = new Random();
 
     public SimpleSA(
-        double desiredFitness,
+        double desiredPenalty,
         double desiredPrecision,
         IProblem<T> problem,
         IMutation<T> mutation,
@@ -20,7 +20,7 @@ public class SimpleSA<T> extends AbstractSA<T> {
         ICoolingSchedule innerCoolingSchedule
     ) {
         super(
-            desiredFitness,
+            desiredPenalty,
             desiredPrecision,
             problem,
             mutation,
@@ -32,7 +32,6 @@ public class SimpleSA<T> extends AbstractSA<T> {
     @Override
     protected Solution<T> onOuterTemperatureStart(
         Solution<T> currentSolution,
-        Solution<T> bestSolution,
         double outerTemperature
     ) {
         return currentSolution;
@@ -41,7 +40,6 @@ public class SimpleSA<T> extends AbstractSA<T> {
     @Override
     protected Solution<T> onInnerTemperatureStart(
         Solution<T> currentSolution,
-        Solution<T> bestSolution,
         double outerTemperature,
         double innerTemperature
     ) {
@@ -52,7 +50,6 @@ public class SimpleSA<T> extends AbstractSA<T> {
     protected Solution<T> selectNextSolution(
         Solution<T> currentSolution,
         Solution<T> neighbourSolution,
-        Solution<T> bestSolution,
         double outerTemperature,
         double innerTemperature
     ) {
