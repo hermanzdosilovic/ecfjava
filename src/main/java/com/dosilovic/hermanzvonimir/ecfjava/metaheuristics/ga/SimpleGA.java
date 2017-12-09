@@ -34,10 +34,7 @@ public class SimpleGA<T> extends AbstractGA<T> {
     }
 
     @Override
-    protected Collection<Solution<T>> createNextPopulation(
-        Collection<Solution<T>> currentPopulation,
-        Solution<T> bestSolution
-    ) {
+    protected Collection<Solution<T>> createNextPopulation(Collection<Solution<T>> currentPopulation) {
         Collection<Solution<T>> nextPopulation = new ArrayList<>(currentPopulation.size());
 
         if (useElitism) {

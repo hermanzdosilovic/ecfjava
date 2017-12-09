@@ -1,5 +1,6 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.ga;
 
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractMetaheuristic;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.ICrossover;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
@@ -8,9 +9,11 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
 import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 
-public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
+public abstract class AbstractOSGA<T> extends AbstractMetaheuristic<T> implements IGeneticAlgorithm<T> {
 
     protected boolean          useElitism;
     protected int              maxGenerations;
@@ -24,6 +27,8 @@ public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
     protected ISelection<T> selection;
     protected ICrossover<T> crossover;
     protected IMutation<T>  mutation;
+
+    protected Solution<T> bestSolution;
 
     protected Collection<Solution<T>> initialPopulation;
 
@@ -61,6 +66,11 @@ public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
     }
 
     @Override
+    public Solution<T> getBestSolution() {
+        return bestSolution;
+    }
+
+    @Override
     public T run(Collection<T> initialPopulation) {
         setInitialPopulation(initialPopulation);
         return run();
@@ -77,7 +87,6 @@ public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
         Collection<Solution<T>> currentPopulation = initialPopulation;
         Collection<Solution<T>> successfulPopulation;
         Collection<Solution<T>> unsuccessfulPopulation;
-        Solution<T>             bestSolution;
 
         double actualSelectionPressure = 0;
         double comparisonFactor;
@@ -90,6 +99,7 @@ public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
 
             Solution.evaluateFitness(currentPopulation, problem);
             bestSolution = Solution.findBest(currentPopulation);
+            notifyObservers(bestSolution);
 
             System.err.printf(
                 "Generation #%d (%s):\n" +
@@ -116,7 +126,6 @@ public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
             successfulPopulation = createSuccessfulPopulation(
                 currentPopulation,
                 unsuccessfulPopulation,
-                bestSolution,
                 comparisonFactor,
                 successRatio
             );
@@ -132,8 +141,7 @@ public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
             currentPopulation = createNextPopulation(
                 currentPopulation,
                 successfulPopulation,
-                unsuccessfulPopulation,
-                bestSolution
+                unsuccessfulPopulation
             );
 
             if (generation == maxGenerations) {
@@ -144,6 +152,7 @@ public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
 
         Solution.evaluateFitness(currentPopulation, problem);
         bestSolution = Solution.findBest(currentPopulation);
+        notifyObservers(bestSolution);
 
         long     stopTime = System.nanoTime();
         Duration duration = Duration.ofNanos(stopTime - startTime);
@@ -165,7 +174,6 @@ public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
     protected abstract Collection<Solution<T>> createSuccessfulPopulation(
         Collection<Solution<T>> currentPopulation,
         Collection<Solution<T>> unsuccessfulPopulation,
-        Solution<T> bestSolution,
         double comparisonFactor,
         double successRatio
     );
@@ -173,7 +181,6 @@ public abstract class AbstractOSGA<T> implements IGeneticAlgorithm<T> {
     protected abstract Collection<Solution<T>> createNextPopulation(
         Collection<Solution<T>> currentPopulation,
         Collection<Solution<T>> successfulPopulation,
-        Collection<Solution<T>> unsuccessfulPopulation,
-        Solution<T> bestSolution
+        Collection<Solution<T>> unsuccessfulPopulation
     );
 }

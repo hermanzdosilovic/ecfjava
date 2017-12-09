@@ -43,7 +43,6 @@ public class SimpleOSGA<T> extends AbstractOSGA<T> {
     protected Collection<Solution<T>> createSuccessfulPopulation(
         Collection<Solution<T>> currentPopulation,
         Collection<Solution<T>> unsuccessfulPopulation,
-        Solution<T> bestSolution,
         double comparisonFactor,
         double successRatio
     ) {
@@ -94,8 +93,7 @@ public class SimpleOSGA<T> extends AbstractOSGA<T> {
     protected Collection<Solution<T>> createNextPopulation(
         Collection<Solution<T>> currentPopulation,
         Collection<Solution<T>> successfulPopulation,
-        Collection<Solution<T>> unsuccessfulPopulation,
-        Solution<T> bestSolution
+        Collection<Solution<T>> unsuccessfulPopulation
     ) {
         Collection<Solution<T>> nextPopulation             = new ArrayList<>(successfulPopulation);
         List<Solution<T>>       unsuccessfulPopulationList = new ArrayList<>(unsuccessfulPopulation);

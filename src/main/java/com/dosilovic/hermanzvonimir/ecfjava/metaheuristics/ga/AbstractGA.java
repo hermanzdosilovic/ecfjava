@@ -1,5 +1,6 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.ga;
 
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractMetaheuristic;
 import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.ICrossover;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
+public abstract class AbstractGA<T> extends AbstractMetaheuristic<T> implements IGeneticAlgorithm<T> {
 
     protected boolean useElitism;
     protected int     maxGenerations;
@@ -22,6 +23,8 @@ public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
     protected ISelection<T> selection;
     protected ICrossover<T> crossover;
     protected IMutation<T>  mutation;
+
+    protected Solution<T> bestSolution;
 
     protected Collection<Solution<T>> initialPopulation;
 
@@ -53,6 +56,11 @@ public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
     }
 
     @Override
+    public Solution<T> getBestSolution() {
+        return bestSolution;
+    }
+
+    @Override
     public T run(Collection<T> initialPopulation) {
         setInitialPopulation(initialPopulation);
         return run();
@@ -67,12 +75,12 @@ public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
         }
 
         Collection<Solution<T>> currentPopulation = initialPopulation;
-        Solution<T>             bestSolution;
 
         int generation;
         for (generation = 1; generation <= maxGenerations; generation++) {
             Solution.evaluateFitness(currentPopulation, problem);
             bestSolution = Solution.findBest(currentPopulation);
+            notifyObservers(bestSolution);
 
             System.err.printf(
                 "Generation #%d (%s):\n\tbestFitness = %f\n\n",
@@ -86,7 +94,7 @@ public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
                 break;
             }
 
-            currentPopulation = createNextPopulation(currentPopulation, bestSolution);
+            currentPopulation = createNextPopulation(currentPopulation);
 
             if (generation == maxGenerations) {
                 System.err.println("Max generations reached.\n");
@@ -96,6 +104,7 @@ public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
 
         Solution.evaluateFitness(currentPopulation, problem);
         bestSolution = Solution.findBest(currentPopulation);
+        notifyObservers(bestSolution);
 
         long     stopTime = System.nanoTime();
         Duration duration = Duration.ofNanos(stopTime - startTime);
@@ -114,8 +123,5 @@ public abstract class AbstractGA<T> implements IGeneticAlgorithm<T> {
         return bestSolution.getRepresentative();
     }
 
-    protected abstract Collection<Solution<T>> createNextPopulation(
-        Collection<Solution<T>> currentPopulation,
-        Solution<T> bestSolution
-    );
+    protected abstract Collection<Solution<T>> createNextPopulation(Collection<Solution<T>> currentPopulation);
 }

@@ -1,5 +1,6 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa;
 
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractMetaheuristic;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
@@ -8,7 +9,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
 import java.time.Duration;
 import java.util.Date;
 
-public abstract class AbstractSA<T> implements ISimulatedAnnealing<T> {
+public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements ISimulatedAnnealing<T> {
 
     protected IProblem<T>      problem;
     protected IMutation<T>     mutation;
@@ -17,6 +18,7 @@ public abstract class AbstractSA<T> implements ISimulatedAnnealing<T> {
     protected double           desiredPenalty;
     protected double           desiredPrecision;
 
+    protected Solution<T> bestSolution;
     protected Solution<T> initialSolution;
 
     public AbstractSA(
@@ -39,6 +41,10 @@ public abstract class AbstractSA<T> implements ISimulatedAnnealing<T> {
         this.initialSolution = new Solution<>(initialSolution);
     }
 
+    public Solution<T> getBestSolution() {
+        return bestSolution;
+    }
+
     @Override
     public T run(T initialSolution) {
         setInitialSolution(initialSolution);
@@ -54,12 +60,13 @@ public abstract class AbstractSA<T> implements ISimulatedAnnealing<T> {
         }
 
         Solution<T> currentSolution = initialSolution;
-        Solution<T> bestSolution    = initialSolution;
+        bestSolution = initialSolution;
 
         currentSolution.evaluatePenalty(problem);
 
         for (double outerTemperature : outerCoolingSchedule) {
             currentSolution = onOuterTemperatureStart(currentSolution, bestSolution, outerTemperature);
+            notifyObservers(currentSolution);
 
             System.err.printf(
                 "Temperature %f (%s):\n" +
