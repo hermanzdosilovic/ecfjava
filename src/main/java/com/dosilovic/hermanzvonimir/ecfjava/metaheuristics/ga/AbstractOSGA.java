@@ -58,6 +58,7 @@ public abstract class AbstractOSGA<T> extends AbstractMetaheuristic<T> implement
         this.mutation = mutation;
     }
 
+    @Override
     public void setInitialPopulation(final Collection<T> initialPopulation) {
         this.initialPopulation = new ArrayList<>();
         for (T individual : initialPopulation) {

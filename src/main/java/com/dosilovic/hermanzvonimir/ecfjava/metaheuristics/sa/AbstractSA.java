@@ -37,6 +37,7 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
         this.innerCoolingSchedule = innerCoolingSchedule;
     }
 
+    @Override
     public void setInitialSolution(final T initialSolution) {
         this.initialSolution = new Solution<>(initialSolution);
     }

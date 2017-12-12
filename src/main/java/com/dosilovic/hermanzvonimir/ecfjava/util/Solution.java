@@ -24,6 +24,10 @@ public class Solution<T> implements Comparable<Solution<T>> {
         return representative;
     }
 
+    public void setRepresentative(T representative) {
+        this.representative = representative;
+    }
+
     public double getFitness() {
         return fitness;
     }
@@ -157,7 +161,7 @@ public class Solution<T> implements Comparable<Solution<T>> {
 
     @Override
     public String toString() {
-        return this.toString();
+        return representative.toString();
     }
 
     @Override
