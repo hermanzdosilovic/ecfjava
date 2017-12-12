@@ -88,7 +88,7 @@ public class BasicPSO<T extends RealVector> extends AbstractMetaheuristic<T> imp
 
             System.err.printf(
                 "Iteration #%d (%s):\n" +
-                "\tbestFitness            = %f\n\n",
+                "\tbestFitness = %f\n\n",
                 iteration,
                 new Date(),
                 bestSolution.getFitness()
