@@ -39,7 +39,7 @@ public class SimpleGA<T> extends AbstractGA<T> {
 
         if (useElitism) {
             nextPopulation.add(bestSolution);
-            nextPopulation.add(Solution.findSecondBest(currentPopulation));
+            nextPopulation.add(Solution.findSecondBestByFitness(currentPopulation));
         }
 
         while (nextPopulation.size() < currentPopulation.size()) {
@@ -54,7 +54,7 @@ public class SimpleGA<T> extends AbstractGA<T> {
             }
 
             Solution.evaluateFitness(mutatedChildren, problem, true);
-            nextPopulation.add(Solution.findBest(mutatedChildren));
+            nextPopulation.add(Solution.findBestByFitness(mutatedChildren));
         }
 
         return nextPopulation;

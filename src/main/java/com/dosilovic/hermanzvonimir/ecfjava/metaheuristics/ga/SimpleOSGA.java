@@ -101,7 +101,7 @@ public class SimpleOSGA<T> extends AbstractOSGA<T> {
 
         if (useElitism) {
             nextPopulation.add(bestSolution);
-            nextPopulation.add(Solution.findSecondBest(currentPopulation));
+            nextPopulation.add(Solution.findSecondBestByFitness(currentPopulation));
         }
 
         for (int i = unsuccessfulPopulationList.size() - 1;

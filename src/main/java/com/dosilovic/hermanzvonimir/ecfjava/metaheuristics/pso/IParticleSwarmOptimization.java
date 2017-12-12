@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public interface IParticleSwarmOptimization<T extends RealVector> extends IMetaheuristic<T> {
 
-    public T run(Collection<T> initialParticles);
+    public T run(Collection<Particle<T>> initialParticles);
 
-    public void setInitialParticles(Collection<T> initialParticles);
+    public void setInitialParticles(Collection<Particle<T>> initialParticles);
 }

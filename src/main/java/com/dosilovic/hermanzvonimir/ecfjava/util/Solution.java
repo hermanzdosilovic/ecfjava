@@ -2,7 +2,6 @@ package com.dosilovic.hermanzvonimir.ecfjava.util;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class Solution<T> implements Comparable<Solution<T>> {
@@ -46,11 +45,11 @@ public class Solution<T> implements Comparable<Solution<T>> {
         hasPenalty = true;
     }
 
-    public boolean isHasFitness() {
+    public boolean hasFitness() {
         return hasFitness;
     }
 
-    public boolean isHasPenalty() {
+    public boolean hasPenalty() {
         return hasPenalty;
     }
 
@@ -64,20 +63,6 @@ public class Solution<T> implements Comparable<Solution<T>> {
         evaluateFitness(problem, false);
     }
 
-    public static <T> void evaluateFitness(
-        Collection<Solution<T>> solutions, IProblem<T> problem,
-        boolean updateIfHasFitness
-    ) {
-        for (Solution<T> solution : solutions) {
-            solution.evaluateFitness(problem, updateIfHasFitness);
-        }
-    }
-
-    public static <T> void evaluateFitness(Collection<Solution<T>> solutions, IProblem<T> problem) {
-        evaluateFitness(solutions, problem, false);
-    }
-
-
     public void evaluatePenalty(IProblem<T> problem, boolean updateIfHasPenalty) {
         if ((hasPenalty && updateIfHasPenalty) || !hasPenalty) {
             setPenalty(problem.penalty(representative));
@@ -86,56 +71,6 @@ public class Solution<T> implements Comparable<Solution<T>> {
 
     public void evaluatePenalty(IProblem<T> problem) {
         evaluatePenalty(problem, false);
-    }
-
-    public static <T> void evaluatePenalty(
-        Collection<Solution<T>> solutions, IProblem<T> problem,
-        boolean updateIfHasPenalty
-    ) {
-        for (Solution<T> solution : solutions) {
-            solution.evaluatePenalty(problem, updateIfHasPenalty);
-        }
-    }
-
-    public static <T> void evaluatePenalty(Collection<Solution<T>> solutions, IProblem<T> problem) {
-        evaluatePenalty(solutions, problem, false);
-    }
-
-    public static <T> Collection<T> collectRepresentatives(Collection<Solution<T>> solutions) {
-        Collection<T> representatives = new ArrayList<>(solutions.size());
-        for (Solution<T> solution : solutions) {
-            representatives.add(solution.representative);
-        }
-        return representatives;
-    }
-
-    public static <T> Solution<T> findBest(Collection<Solution<T>> solutions) {
-        Solution<T> currentBestSolution = null;
-
-        for (Solution<T> solution : solutions) {
-            if (currentBestSolution == null || solution.getFitness() > currentBestSolution.getFitness()) {
-                currentBestSolution = solution;
-            }
-        }
-
-        return currentBestSolution;
-    }
-
-    public static <T> Solution<T> findSecondBest(Collection<Solution<T>> solutions) {
-        Solution<T> currentBestSolution       = null;
-        Solution<T> currentSecondBestSolution = null;
-
-        for (Solution<T> solution : solutions) {
-            if (currentBestSolution == null || solution.getFitness() > currentBestSolution.getFitness()) {
-                currentSecondBestSolution = currentBestSolution;
-                currentBestSolution = solution;
-            } else if (currentSecondBestSolution == null || solution.getFitness() > currentSecondBestSolution
-                .getFitness()) {
-                currentSecondBestSolution = solution;
-            }
-        }
-
-        return currentSecondBestSolution;
     }
 
     @Override
@@ -172,5 +107,117 @@ public class Solution<T> implements Comparable<Solution<T>> {
             return 1;
         }
         return 0;
+    }
+
+    public static <T> void evaluateFitness(
+        Collection<Solution<T>> solutions,
+        IProblem<T> problem,
+        boolean updateIfHasFitness
+    ) {
+        for (Solution<T> solution : solutions) {
+            solution.evaluateFitness(problem, updateIfHasFitness);
+        }
+    }
+
+    public static <T> void evaluateFitness(Collection<Solution<T>> solutions, IProblem<T> problem) {
+        evaluateFitness(solutions, problem, false);
+    }
+
+    public static <T> void evaluatePenalty(
+        Collection<Solution<T>> solutions,
+        IProblem<T> problem,
+        boolean updateIfHasPenalty
+    ) {
+        for (Solution<T> solution : solutions) {
+            solution.evaluatePenalty(problem, updateIfHasPenalty);
+        }
+    }
+
+    public static <T> void evaluatePenalty(Collection<Solution<T>> solutions, IProblem<T> problem) {
+        evaluatePenalty(solutions, problem, false);
+    }
+
+    public static <T> Solution<T> betterByFitness(Solution<T> first, Solution<T> second) {
+        if (first == null) {
+            return second;
+        } else if (second == null) {
+            return first;
+        } else if (first.getFitness() > second.getFitness()) {
+            return first;
+        }
+        return second;
+    }
+
+    public static <T> Solution<T> worstByFitness(Solution<T> first, Solution<T> second) {
+        if (betterByFitness(first, second) == first) {
+            return second;
+        }
+        return first;
+    }
+
+    public static <T> Solution<T> betterByPenalty(Solution<T> first, Solution<T> second) {
+        if (first == null) {
+            return second;
+        } else if (second == null) {
+            return first;
+        } else if (first.getPenalty() < second.getPenalty()) {
+            return first;
+        }
+        return second;
+    }
+
+    public static <T> Solution<T> worstByPenalty(Solution<T> first, Solution<T> second) {
+        if (betterByPenalty(first, second) == first) {
+            return second;
+        }
+        return first;
+    }
+
+    public static <T> Solution<T> findBestByFitness(Collection<Solution<T>> solutions) {
+        Solution<T> bestSolution = null;
+        for (Solution<T> solution : solutions) {
+            bestSolution = betterByFitness(bestSolution, solution);
+        }
+        return bestSolution;
+    }
+
+    public static <T> Solution<T> findSecondBestByFitness(Collection<Solution<T>> solutions) {
+        Solution<T> bestSolution       = null;
+        Solution<T> secondBestSolution = null;
+
+        for (Solution<T> solution : solutions) {
+            if (betterByFitness(bestSolution, solution) == solution) {
+                secondBestSolution = bestSolution;
+                bestSolution = solution;
+            } else if (betterByFitness(secondBestSolution, solution) == solution) {
+                secondBestSolution = solution;
+            }
+        }
+
+        return secondBestSolution;
+    }
+
+    public static <T> Solution<T> findBestByPenalty(Collection<Solution<T>> solutions) {
+        Solution<T> bestSolution = null;
+        for (Solution<T> solution : solutions) {
+            bestSolution = betterByPenalty(bestSolution, solution);
+        }
+        return bestSolution;
+    }
+
+    public static <T> Solution<T> findSecondBestByPenalty(Collection<Solution<T>> solutions) {
+        Solution<T> bestSolution       = null;
+        Solution<T> secondBestSolution = null;
+
+        for (Solution<T> solution : solutions) {
+            if (betterByPenalty(bestSolution, solution) == solution) {
+                secondBestSolution = bestSolution;
+                bestSolution = solution;
+            } else if (betterByPenalty(secondBestSolution, solution) == solution) {
+                secondBestSolution = solution;
+            }
+        }
+
+        return secondBestSolution;
     }
 }

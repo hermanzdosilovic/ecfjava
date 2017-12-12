@@ -99,7 +99,7 @@ public abstract class AbstractOSGA<T> extends AbstractMetaheuristic<T> implement
             successRatio = successRatioSchedule.getTemperature(generation - 1);
 
             Solution.evaluateFitness(currentPopulation, problem);
-            bestSolution = Solution.findBest(currentPopulation);
+            bestSolution = Solution.findBestByFitness(currentPopulation);
             notifyObservers(bestSolution);
 
             System.err.printf(
@@ -152,7 +152,7 @@ public abstract class AbstractOSGA<T> extends AbstractMetaheuristic<T> implement
         }
 
         Solution.evaluateFitness(currentPopulation, problem);
-        bestSolution = Solution.findBest(currentPopulation);
+        bestSolution = Solution.findBestByFitness(currentPopulation);
         notifyObservers(bestSolution);
 
         long     stopTime = System.nanoTime();

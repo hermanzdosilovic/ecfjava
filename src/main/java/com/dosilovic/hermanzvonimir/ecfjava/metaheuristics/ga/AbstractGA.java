@@ -80,7 +80,7 @@ public abstract class AbstractGA<T> extends AbstractMetaheuristic<T> implements 
         int generation;
         for (generation = 1; generation <= maxGenerations; generation++) {
             Solution.evaluateFitness(currentPopulation, problem);
-            bestSolution = Solution.findBest(currentPopulation);
+            bestSolution = Solution.findBestByFitness(currentPopulation);
             notifyObservers(bestSolution);
 
             System.err.printf(
@@ -104,7 +104,7 @@ public abstract class AbstractGA<T> extends AbstractMetaheuristic<T> implements 
         }
 
         Solution.evaluateFitness(currentPopulation, problem);
-        bestSolution = Solution.findBest(currentPopulation);
+        bestSolution = Solution.findBestByFitness(currentPopulation);
         notifyObservers(bestSolution);
 
         long     stopTime = System.nanoTime();

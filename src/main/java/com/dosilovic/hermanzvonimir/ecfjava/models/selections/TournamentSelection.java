@@ -29,6 +29,6 @@ public class TournamentSelection<T> implements ISelection<T> {
             }
         }
 
-        return Solution.findBest(competitors);
+        return Solution.findBestByFitness(competitors);
     }
 }

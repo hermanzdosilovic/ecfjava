@@ -29,6 +29,10 @@ public class RealVector extends ArrayRealVector implements IVector<Double> {
         }
     }
 
+    public RealVector(int size, double initialValue) {
+        this(size, initialValue, initialValue);
+    }
+
     @Override
     public Double getValue(int index) {
         return getEntry(index);

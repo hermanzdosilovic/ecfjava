@@ -1,71 +1,55 @@
 package com.dosilovic.hermanzvonimir.ecfjava.examples.pso;
 
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.FullyInformedPSO;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.BasicPSO;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.IParticleSwarmOptimization;
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.GeometricCoolingSchedule;
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.Particle;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.FunctionMinimizationProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.RastriginFunction;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
+import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public final class RastriginFIPSO {
 
     public static void main(String[] args) {
-        final int    NUMBER_OF_COMPONENTS     = 20;
-        final int    NUMBER_OF_PARTICLES      = 500;
-        final int    MAX_NUMBER_OF_ITERATIONS = 20000;
-        final double DESIRED_FITNESS          = 0;
-        final double DESIRED_PRECISION        = 1e-2;
-        final double MIN_INDIVIDUAL_FACTOR    = 1.0;
-        final double MAX_INDIVIDUAL_FACTOR    = 2.0;
-        final double MIN_SOCIAL_FACTOR        = 3.0;
-        final double MAX_SOCIAL_FACTOR        = 4.0;
-        final double MIN_INERTIA_FACTOR       = 1;
-        final double MAX_INERTIA_FACTOR       = 1;
-        final double MIN_CONSTRICTION_FACTOR  = 0.7;
-        final double MAX_CONSTRICTION_FACTOR  = 0.7;
-        final double MIN_COMPONENT_VALUE      = -1;
-        final double MAX_COMPONENT_VALUE      = 1;
+        final int    NUMBER_OF_COMPONENTS = 10;
+        final int    NUMBER_OF_PARTICLES  = 60;
+        final int    MAX_ITERATIONS       = 1000000;
+        final double DESIRED_FITNESS      = 0;
+        final double DESIRED_PRECISION    = 1e-2;
+        final double INDIVIDUAL_FACTOR    = 2.05;
+        final double SOCIAL_FACTOR        = 2.05;
+        final double MIN_VALUE            = -5;
+        final double MAX_VALUE            = 5;
+        final double MIN_SPEED            = -5;
+        final double MAX_SPEED            = 5;
 
         IProblem<RealVector> problem = new FunctionMinimizationProblem<>(new RastriginFunction<>());
-        ICoolingSchedule individualFactorSchedule = new GeometricCoolingSchedule(
-            MAX_NUMBER_OF_ITERATIONS,
-            MAX_INDIVIDUAL_FACTOR,
-            MIN_INDIVIDUAL_FACTOR
-        );
-        ICoolingSchedule socialFactorSchedule = new GeometricCoolingSchedule(
-            MAX_NUMBER_OF_ITERATIONS,
-            MAX_SOCIAL_FACTOR,
-            MIN_SOCIAL_FACTOR
-        );
-        ICoolingSchedule inertiaSchedule = new GeometricCoolingSchedule(
-            MAX_NUMBER_OF_ITERATIONS,
-            MAX_INERTIA_FACTOR,
-            MIN_INERTIA_FACTOR
-        );
-        ICoolingSchedule constrictionFactorSchedule = new GeometricCoolingSchedule(
-            MAX_NUMBER_OF_ITERATIONS,
-            MAX_CONSTRICTION_FACTOR,
-            MIN_CONSTRICTION_FACTOR
-        );
 
-        IParticleSwarmOptimization<RealVector> particleSwarmOptimization = new FullyInformedPSO<>(
-            MAX_NUMBER_OF_ITERATIONS,
+        Collection<Particle<RealVector>> initialParticles = new ArrayList<>();
+        for (int i = 0; i < NUMBER_OF_PARTICLES; i++) {
+            initialParticles.add(new Particle<>(
+                new Solution<>(new RealVector(NUMBER_OF_COMPONENTS, MIN_VALUE, MAX_VALUE)),
+                new RealVector(NUMBER_OF_COMPONENTS, MIN_SPEED, MAX_SPEED)
+            ));
+        }
+
+        IParticleSwarmOptimization<RealVector> iParticleSwarmOptimization = new BasicPSO<>(
+            MAX_ITERATIONS,
             DESIRED_FITNESS,
             DESIRED_PRECISION,
-            problem,
-            individualFactorSchedule,
-            socialFactorSchedule,
-            inertiaSchedule,
-            constrictionFactorSchedule
+            INDIVIDUAL_FACTOR,
+            SOCIAL_FACTOR,
+            new RealVector(NUMBER_OF_COMPONENTS, MIN_VALUE),
+            new RealVector(NUMBER_OF_COMPONENTS, MAX_VALUE),
+            new RealVector(NUMBER_OF_COMPONENTS, MIN_SPEED),
+            new RealVector(NUMBER_OF_COMPONENTS, MAX_SPEED),
+            problem
         );
 
-        particleSwarmOptimization.run(RealVector.createCollection(
-            NUMBER_OF_PARTICLES,
-            NUMBER_OF_COMPONENTS,
-            MIN_COMPONENT_VALUE,
-            MAX_COMPONENT_VALUE
-        ));
+        iParticleSwarmOptimization.run(initialParticles);
     }
 }
