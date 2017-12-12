@@ -2,23 +2,23 @@ package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling;
 
 import java.util.Iterator;
 
-public class GeometricCoolingSchedule extends AbstractCoolingSchedule {
+public class LinearCoolingSchedule extends AbstractCoolingSchedule {
 
-    private double alpha;
+    private double beta;
     private int    numberOfIterations;
     private double finalTemperature;
 
-    public GeometricCoolingSchedule(int numberOfIterations, double initialTemperature, double finalTemperature) {
+    public LinearCoolingSchedule(int numberOfIterations, double initialTemperature, double finalTemperature) {
         super(initialTemperature);
         this.numberOfIterations = numberOfIterations;
         this.finalTemperature = finalTemperature;
-        calculateAlpha();
+        calculateBeta();
     }
 
     @Override
     public void setInitialTemperature(double initialTemperature) {
         super.setInitialTemperature(initialTemperature);
-        calculateAlpha();
+        calculateBeta();
     }
 
     public double getFinalTemperature() {
@@ -27,15 +27,15 @@ public class GeometricCoolingSchedule extends AbstractCoolingSchedule {
 
     public void setFinalTemperature(double finalTemperature) {
         this.finalTemperature = finalTemperature;
-        calculateAlpha();
+        calculateBeta();
     }
 
-    public double getAlpha() {
-        return alpha;
+    public double getBeta() {
+        return beta;
     }
 
-    public void setAlpha(double alpha) {
-        this.alpha = alpha;
+    public void setBeta(double beta) {
+        this.beta = beta;
     }
 
     public int getNumberOfIterations() {
@@ -44,17 +44,17 @@ public class GeometricCoolingSchedule extends AbstractCoolingSchedule {
 
     public void setNumberOfIterations(int numberOfIterations) {
         this.numberOfIterations = numberOfIterations;
-        calculateAlpha();
+        calculateBeta();
     }
 
     @Override
     public double getTemperature(int iteration) {
-        return Math.pow(alpha, iteration) * initialTemperature;
+        return initialTemperature - iteration * beta;
     }
 
     @Override
     public Iterator<Double> iterator() {
-        return new Iterator<>() {
+        return new Iterator<Double>() {
             private int currentIteration;
 
             @Override
@@ -69,7 +69,7 @@ public class GeometricCoolingSchedule extends AbstractCoolingSchedule {
         };
     }
 
-    private void calculateAlpha() {
-        alpha = Math.pow(finalTemperature / initialTemperature, 1.0 / (double) (numberOfIterations - 1));
+    private void calculateBeta() {
+        beta = (initialTemperature - finalTemperature) / (numberOfIterations - 1);
     }
 }

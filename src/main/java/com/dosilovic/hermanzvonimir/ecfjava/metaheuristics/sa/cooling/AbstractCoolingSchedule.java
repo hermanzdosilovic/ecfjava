@@ -2,7 +2,7 @@ package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling;
 
 public abstract class AbstractCoolingSchedule implements ICoolingSchedule {
 
-    private double initialTemperature;
+    protected double initialTemperature;
 
     public AbstractCoolingSchedule(double initialTemperature) {
         this.initialTemperature = initialTemperature;
