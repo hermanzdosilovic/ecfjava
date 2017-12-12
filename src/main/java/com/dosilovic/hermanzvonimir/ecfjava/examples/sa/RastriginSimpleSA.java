@@ -11,9 +11,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.RastriginFunction;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 
-import java.util.Random;
-
-public final class RastringSimpleSA {
+public final class RastriginSimpleSA {
 
     public static void main(String[] args) {
         final int     NUMBER_OF_COMPONENTS = 30;
