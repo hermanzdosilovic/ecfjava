@@ -12,7 +12,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public final class RastriginFIPSO {
+public final class RastriginBasicPSO {
 
     public static void main(String[] args) {
         final int    NUMBER_OF_COMPONENTS = 10;
