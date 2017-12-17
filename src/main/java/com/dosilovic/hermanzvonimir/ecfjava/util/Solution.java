@@ -2,6 +2,7 @@ package com.dosilovic.hermanzvonimir.ecfjava.util;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class Solution<T> implements Comparable<Solution<T>> {
@@ -219,5 +220,13 @@ public class Solution<T> implements Comparable<Solution<T>> {
         }
 
         return secondBestSolution;
+    }
+
+    public static <T> Collection<Solution<T>> createCollection(Collection<T> representatives) {
+        Collection<Solution<T>> solutions = new ArrayList<>();
+        for (T representative : representatives) {
+            solutions.add(new Solution<>(representative));
+        }
+        return solutions;
     }
 }
