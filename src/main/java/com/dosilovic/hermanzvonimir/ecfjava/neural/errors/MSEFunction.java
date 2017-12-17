@@ -16,8 +16,8 @@ public class MSEFunction<T extends RealVector> implements IFunction<T> {
     }
 
     @Override
-    public double getValue(T weights) {
-        neuralNetwork.setWeights(weights.toArray());
+    public double getValue(T parameters) {
+        neuralNetwork.setParameters(parameters.toArray());
         return NNErrorUtil.meanSquaredError(neuralNetwork, dataset);
     }
 }

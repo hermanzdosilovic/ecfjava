@@ -9,16 +9,22 @@ import org.apache.commons.math3.linear.RealVector;
 
 import java.util.Random;
 
-public class FeedForwardANN implements INeuralNetwork {
+public class ElmanNN implements INeuralNetwork {
 
     private int[]         architecture;
     private IActivation[] layerActivations;
     private RealMatrix[]  layerWeights;
+    private RealVector    context;
     private int           numberOfWeights;
+    private int           numberOfParameters;
 
     private static final Random RAND = new Random();
 
-    public FeedForwardANN(int... architecture) {
+    public ElmanNN(int... architecture) {
+        if (architecture.length < 3) {
+            throw new IllegalArgumentException("Should have at least one hidden layer");
+        }
+
         this.architecture = architecture.clone();
         layerActivations = new IActivation[architecture.length];
         for (int i = 0; i < layerActivations.length; i++) {
@@ -27,8 +33,10 @@ public class FeedForwardANN implements INeuralNetwork {
         setupLayerWeights();
     }
 
-    public FeedForwardANN(int[] architecture, IActivation... layerActivations) {
-        if (
+    public ElmanNN(int[] architecture, IActivation... layerActivations) {
+        if (architecture.length < 3) {
+            throw new IllegalArgumentException("Should have at least one hidden layer");
+        } else if (
             layerActivations.length != architecture.length &&
             layerActivations.length != architecture.length - 1 &&
             layerActivations.length != architecture.length - 2) {
@@ -73,7 +81,7 @@ public class FeedForwardANN implements INeuralNetwork {
 
     @Override
     public int getNumberOfParameters() {
-        return numberOfWeights;
+        return numberOfParameters;
     }
 
     @Override
@@ -93,7 +101,18 @@ public class FeedForwardANN implements INeuralNetwork {
 
     @Override
     public void setWeights(double[] weights) {
-        int offset = 0;
+        setWeights(weights, 0);
+    }
+
+    @Override
+    public void setParameters(double[] parameters) {
+        for (int i = 0; i < context.getDimension(); i++) {
+            context.setEntry(i, parameters[i]);
+        }
+        setWeights(parameters, context.getDimension());
+    }
+
+    private void setWeights(double[] weights, int offset) {
         for (RealMatrix layerWeight : layerWeights) {
             for (int i = 0; i < layerWeight.getRowDimension(); i++) {
                 for (int j = 0; j < layerWeight.getColumnDimension(); j++) {
@@ -104,22 +123,21 @@ public class FeedForwardANN implements INeuralNetwork {
     }
 
     @Override
-    public void setParameters(double[] parameters) {
-        setWeights(parameters);
-    }
-
-    @Override
     public double[] forward(double[]... inputs) {
         double[] output = new double[inputs.length * getOutputSize()];
         int      offset = 0;
 
         for (double[] input : inputs) {
             RealVector vector = new ArrayRealVector(input);
-            vector = vector.map(layerActivations[0].getValueFunction()).append(1.0);
+            vector = vector.map(layerActivations[0].getValueFunction()).append(context).append(1.0);
 
             for (int i = 0; i < layerWeights.length; i++) {
                 vector = layerWeights[i].preMultiply(vector);
                 vector = vector.map(layerActivations[i + 1].getValueFunction());
+
+                if (i == 0) {
+                    context = vector;
+                }
 
                 if (i + 1 < layerWeights.length) {
                     vector = vector.append(1.0);
@@ -138,9 +156,18 @@ public class FeedForwardANN implements INeuralNetwork {
         layerWeights = new RealMatrix[architecture.length - 1];
         numberOfWeights = 0;
 
+        context = new ArrayRealVector(architecture[1]);
+        for (int i = 0; i < context.getDimension(); i++) {
+            context.setEntry(i, RAND.nextDouble());
+        }
+
         for (int n = 1; n < architecture.length; n++) {
             int rows = architecture[n - 1] + 1;
             int cols = architecture[n];
+
+            if (n == 1) {
+                rows += architecture[n];
+            }
 
             layerWeights[n - 1] = new Array2DRowRealMatrix(rows, cols);
             numberOfWeights += rows * cols;
@@ -152,5 +179,7 @@ public class FeedForwardANN implements INeuralNetwork {
                 }
             }
         }
+
+        numberOfParameters = numberOfWeights + context.getDimension();
     }
 }

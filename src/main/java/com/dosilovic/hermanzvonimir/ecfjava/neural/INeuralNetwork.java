@@ -10,6 +10,8 @@ public interface INeuralNetwork {
 
     public int getNumberOfWeights();
 
+    public int getNumberOfParameters();
+
     public int getInputSize();
 
     public int getOutputSize();
@@ -17,6 +19,8 @@ public interface INeuralNetwork {
     public IActivation[] getLayerActivations();
 
     public void setWeights(double[] weights);
+
+    public void setParameters(double[] parameters);
 
     public double[] forward(double[]... input);
 }

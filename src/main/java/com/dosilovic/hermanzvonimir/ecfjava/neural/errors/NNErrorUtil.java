@@ -16,6 +16,9 @@ public final class NNErrorUtil {
 
             for (int i = 0; i < actualOutput.length; i++) {
                 error += Math.pow(networkOutput[i] - actualOutput[i], 2);
+                if (Double.isNaN(error)) {
+                    return Double.MAX_VALUE;
+                }
             }
         }
 
