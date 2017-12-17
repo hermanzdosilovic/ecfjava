@@ -1,5 +1,7 @@
 package com.dosilovic.hermanzvonimir.ecfjava.util;
 
+import java.util.Arrays;
+
 public class DatasetEntry {
 
     private double[] input;
@@ -66,5 +68,13 @@ public class DatasetEntry {
             arrayOfOutputs[i] = dataset[i].output;
         }
         return arrayOfOutputs;
+    }
+
+    public static Pair<DatasetEntry[], DatasetEntry[]> split(DatasetEntry[] dataset, double ratio) {
+        int firstSize = (int) (dataset.length * ratio);
+        return new Pair<>(
+            Arrays.copyOfRange(dataset, 0, firstSize),
+            Arrays.copyOfRange(dataset, firstSize, dataset.length)
+        );
     }
 }
