@@ -6,6 +6,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Particle<T> implements Comparable<Particle<T>> {
 
@@ -13,9 +14,14 @@ public class Particle<T> implements Comparable<Particle<T>> {
     private Solution<T> personalBestSolution;
     private RealVector  currentSpeed;
 
+    private int id;
+
+    private static final AtomicInteger particlesCounter = new AtomicInteger(Integer.MIN_VALUE);
+
     public Particle(Solution<T> initialSolution, RealVector initialSpeed) {
         this.currentSolution = initialSolution;
         this.currentSpeed = initialSpeed;
+        this.id = particlesCounter.getAndIncrement();
     }
 
     public Solution<T> getCurrentSolution() {
@@ -68,7 +74,7 @@ public class Particle<T> implements Comparable<Particle<T>> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(currentSolution, personalBestSolution);
+        return Objects.hash(id);
     }
 
     @Override
