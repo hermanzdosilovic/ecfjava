@@ -4,7 +4,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopol
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 
-public class BasicPSO<T extends RealVector> extends AbstractPSO<T> {
+public class BasicPSO<T extends RealVector> extends AbstractBasicPSO<T> {
 
     public BasicPSO(
         int maxIterations,

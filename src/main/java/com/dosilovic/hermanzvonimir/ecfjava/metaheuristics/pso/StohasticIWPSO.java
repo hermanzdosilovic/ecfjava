@@ -6,7 +6,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 
 import java.util.Random;
 
-public class StohasticIWPSO<T extends RealVector> extends AbstractPSO<T> {
+public class StohasticIWPSO<T extends RealVector> extends AbstractBasicPSO<T> {
 
     private static final Random RAND = new Random();
 

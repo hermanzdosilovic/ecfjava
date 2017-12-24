@@ -1,15 +1,15 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso;
 
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopology;
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 
-public class TimeVaryingIWPSO<T extends RealVector> extends AbstractBasicPSO<T> {
+public abstract class AbstractBasicPSO<T extends RealVector> extends AbstractPSO<T> {
 
-    private ICoolingSchedule inertiaWeightSchedule;
+    private RealVector minSpeed;
+    private RealVector maxSpeed;
 
-    public TimeVaryingIWPSO(
+    public AbstractBasicPSO(
         int maxIterations,
         double desiredFitness,
         double desiredPrecision,
@@ -20,7 +20,6 @@ public class TimeVaryingIWPSO<T extends RealVector> extends AbstractBasicPSO<T> 
         RealVector maxValue,
         RealVector minSpeed,
         RealVector maxSpeed,
-        ICoolingSchedule inertiaWeightSchedule,
         IProblem<T> problem,
         ITopology<T> topology
     ) {
@@ -33,20 +32,16 @@ public class TimeVaryingIWPSO<T extends RealVector> extends AbstractBasicPSO<T> 
             socialFactor,
             minValue,
             maxValue,
-            minSpeed,
-            maxSpeed,
             problem,
             topology
         );
 
-        this.inertiaWeightSchedule = inertiaWeightSchedule;
+        this.minSpeed = minSpeed;
+        this.maxSpeed = maxSpeed;
     }
 
     @Override
-    protected void updateSpeed(int iteration, RealVector speed, RealVector neighboursContribution) {
-        double inertiaWeightFactor = inertiaWeightSchedule.getTemperature(iteration);
-        for (int i = 0; i < speed.getSize(); i++) {
-            speed.setValue(i, inertiaWeightFactor * speed.getValue(i) + neighboursContribution.getValue(i));
-        }
+    protected double limitSpeed(int component, double speed) {
+        return Math.min(Math.max(speed, minSpeed.getValue(component)), maxSpeed.getValue(component));
     }
 }

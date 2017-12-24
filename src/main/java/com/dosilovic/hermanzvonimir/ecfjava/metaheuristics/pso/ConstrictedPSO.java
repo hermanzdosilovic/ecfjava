@@ -5,7 +5,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSc
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 
-public class ConstrictedPSO<T extends RealVector> extends AbstractPSO<T> {
+public class ConstrictedPSO<T extends RealVector> extends AbstractBasicPSO<T> {
 
     private ICoolingSchedule constrictedFactorSchedule;
 
