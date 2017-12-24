@@ -1,6 +1,7 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso;
 
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractMetaheuristic;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopology;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
@@ -8,40 +9,49 @@ import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Random;
 
 public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheuristic<T> implements IParticleSwarmOptimization<T> {
 
-    protected int         maxIterations;
-    protected double      desiredFitness;
-    protected double      desiredPrecision;
-    protected double      individualFactor;
-    protected double      socialFactor;
-    protected RealVector  minValue;
-    protected RealVector  maxValue;
-    protected IProblem<T> problem;
+    protected int          maxIterations;
+    protected double       desiredFitness;
+    protected double       desiredPrecision;
+    protected boolean      isFullyInformed;
+    protected double       individualFactor;
+    protected double       socialFactor;
+    protected RealVector   minValue;
+    protected RealVector   maxValue;
+    protected IProblem<T>  problem;
+    protected ITopology<T> topology;
 
     protected Solution<T> bestSolution;
 
-    Collection<Particle<T>> initialParticles;
+    protected Collection<Particle<T>> initialParticles;
+
+    private static final Random RAND = new Random();
 
     public AbstractPSO(
         int maxIterations,
         double desiredFitness,
         double desiredPrecision,
+        boolean isFullyInformed,
         double individualFactor,
         double socialFactor,
         RealVector minValue,
         RealVector maxValue,
-        IProblem<T> problem
+        IProblem<T> problem,
+        ITopology<T> topology
     ) {
         this.maxIterations = maxIterations;
         this.desiredFitness = desiredFitness;
         this.desiredPrecision = desiredPrecision;
+        this.isFullyInformed = isFullyInformed;
         this.individualFactor = individualFactor;
         this.socialFactor = socialFactor;
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.problem = problem;
+        this.topology = topology;
     }
 
     @Override
@@ -53,6 +63,7 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
     @Override
     public void setInitialParticles(Collection<Particle<T>> initialParticles) {
         this.initialParticles = initialParticles;
+        topology.updateTopology(initialParticles);
     }
 
     @SuppressWarnings("unchecked")
@@ -91,7 +102,7 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
             }
 
             for (Particle<T> particle : particles) {
-                updateParticle(particle);
+                updateParticle(iteration, particle, calculateNeighboursContribution(iteration, particle));
             }
 
             if (iteration == maxIterations) {
@@ -131,5 +142,58 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
         return bestSolution;
     }
 
-    protected abstract void updateParticle(Particle<T> particle);
+    protected double getIndividualFactor(int iteration) {
+        return individualFactor;
+    }
+
+    protected double getSocialFactor(int iteration) {
+        return socialFactor;
+    }
+
+    protected abstract void updateParticle(int iteration, Particle<T> particle, RealVector neighboursContribution);
+
+    private RealVector calculateNeighboursContribution(int iteration, Particle<T> particle) {
+        double individualFactor = getIndividualFactor(iteration);
+        double socialFactor     = getSocialFactor(iteration);
+
+        T          currentRepresentative  = particle.getCurrentSolution().getRepresentative();
+        RealVector neighboursContribution = (RealVector) currentRepresentative.clone();
+
+        Collection<Particle<T>> neighbours = topology.getNeighbours(particle);
+
+        if (isFullyInformed) {
+            double factor = (individualFactor + socialFactor) / neighbours.size();
+
+            double pbi, xi, ci;
+            for (int i = 0; i < neighboursContribution.getSize(); i++) {
+                ci = 0;
+                xi = currentRepresentative.getValue(i);
+
+                for (Particle<T> neighbour : neighbours) {
+                    pbi = neighbour.getPersonalBestSolution().getRepresentative().getValue(i);
+                    ci += factor * RAND.nextDouble() * (pbi - xi);
+                }
+
+                neighboursContribution.setValue(i, ci);
+            }
+        } else {
+            T personalBestRepresentative = particle.getPersonalBestSolution().getRepresentative();
+            T localBestRepresentative =
+                Particle.findBestByPersonalBestFitness(neighbours).getPersonalBestSolution().getRepresentative();
+
+            double pbi, xi, lbi, ci;
+            for (int i = 0; i < neighboursContribution.getSize(); i++) {
+                pbi = personalBestRepresentative.getValue(i);
+                xi = currentRepresentative.getValue(i);
+                lbi = localBestRepresentative.getValue(i);
+
+                ci = individualFactor * RAND.nextDouble() * (pbi - xi) +
+                     socialFactor * RAND.nextDouble() * (lbi - xi);
+
+                neighboursContribution.setValue(i, ci);
+            }
+        }
+
+        return neighboursContribution;
+    }
 }

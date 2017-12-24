@@ -4,9 +4,9 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.Particle;
 
 import java.util.Collection;
 
-public interface ITopology {
+public interface ITopology<T> {
 
-    public Collection<Particle> getNeighbours(Particle particle);
+    public Collection<Particle<T>> getNeighbours(Particle<T> particle);
 
-    public void updateTopology(Collection<Particle> particles);
+    public void updateTopology(Collection<Particle<T>> particles);
 }

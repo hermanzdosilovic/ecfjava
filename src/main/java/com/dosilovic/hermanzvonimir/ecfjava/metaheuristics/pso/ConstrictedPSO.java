@@ -1,16 +1,16 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso;
 
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopology;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
 
-public class BasicPSO<T extends RealVector> extends AbstractPSO<T> {
+public class ConstrictedPSO<T extends RealVector> extends AbstractPSO<T> {
 
-    protected RealVector minSpeed;
-    protected RealVector maxSpeed;
+    private ICoolingSchedule constrictedFactorSchedule;
 
-    public BasicPSO(
+    public ConstrictedPSO(
         int maxIterations,
         double desiredFitness,
         double desiredPrecision,
@@ -19,8 +19,7 @@ public class BasicPSO<T extends RealVector> extends AbstractPSO<T> {
         double socialFactor,
         RealVector minValue,
         RealVector maxValue,
-        RealVector minSpeed,
-        RealVector maxSpeed,
+        ICoolingSchedule constrictedFactorSchedule,
         IProblem<T> problem,
         ITopology<T> topology
     ) {
@@ -37,8 +36,7 @@ public class BasicPSO<T extends RealVector> extends AbstractPSO<T> {
             topology
         );
 
-        this.minSpeed = minSpeed;
-        this.maxSpeed = maxSpeed;
+        this.constrictedFactorSchedule = constrictedFactorSchedule;
     }
 
     @SuppressWarnings("unchecked")
@@ -48,11 +46,10 @@ public class BasicPSO<T extends RealVector> extends AbstractPSO<T> {
         T          currentRepresentative = particle.getCurrentSolution().getRepresentative();
         T          nextRepresentative    = (T) currentRepresentative.clone();
 
+        double constrictionFactor = constrictedFactorSchedule.getTemperature(iteration);
         double v, x;
         for (int i = 0; i < speed.getSize(); i++) {
-            v = speed.getValue(i) + neighboursContribution.getValue(i);
-            v = Math.max(v, minSpeed.getValue(i));
-            v = Math.min(v, maxSpeed.getValue(i));
+            v = constrictionFactor * (speed.getValue(i) + neighboursContribution.getValue(i));
 
             x = currentRepresentative.getValue(i) + v;
             x = Math.max(x, minValue.getValue(i));

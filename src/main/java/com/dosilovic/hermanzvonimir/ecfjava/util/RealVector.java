@@ -48,7 +48,8 @@ public class RealVector extends ArrayRealVector implements IVector<Double> {
         return getDimension();
     }
 
-    @Override public Object clone() {
+    @Override
+    public Object clone() {
         return new RealVector(this);
     }
 
