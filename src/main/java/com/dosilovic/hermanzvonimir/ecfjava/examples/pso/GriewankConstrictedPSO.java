@@ -26,8 +26,10 @@ public final class GriewankConstrictedPSO {
         final double  INDIVIDUAL_FACTOR    = 2.05;
         final double  SOCIAL_FACTOR        = 2.05;
         final double  CONSTRICTION_FACTOR  = 0.729;
-        final double  MIN_VALUE            = -5;
-        final double  MAX_VALUE            = 5;
+        final double  MIN_VALUE            = -600;
+        final double  MAX_VALUE            = 600;
+        final double  MIN_SPEED            = -6;
+        final double  MAX_SPEED            = 6;
 
         IProblem<RealVector> problem = new FunctionMinimizationProblem<>(new GriewankFunction<>());
 
@@ -35,7 +37,7 @@ public final class GriewankConstrictedPSO {
         for (int i = 0; i < NUMBER_OF_PARTICLES; i++) {
             initialParticles.add(new Particle<>(
                 new Solution<>(new RealVector(NUMBER_OF_COMPONENTS, MIN_VALUE, MAX_VALUE)),
-                new RealVector(NUMBER_OF_COMPONENTS, MIN_VALUE, MAX_VALUE)
+                new RealVector(NUMBER_OF_COMPONENTS, MIN_SPEED, MAX_SPEED)
             ));
         }
 
@@ -48,6 +50,8 @@ public final class GriewankConstrictedPSO {
             SOCIAL_FACTOR,
             new RealVector(NUMBER_OF_COMPONENTS, MIN_VALUE),
             new RealVector(NUMBER_OF_COMPONENTS, MAX_VALUE),
+            new RealVector(NUMBER_OF_COMPONENTS, MIN_SPEED),
+            new RealVector(NUMBER_OF_COMPONENTS, MAX_SPEED),
             new ConstantCoolingSchedule(MAX_ITERATIONS, CONSTRICTION_FACTOR),
             problem,
             new RingTopology<>()

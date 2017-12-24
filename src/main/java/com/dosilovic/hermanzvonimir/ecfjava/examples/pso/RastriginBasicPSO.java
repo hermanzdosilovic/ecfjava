@@ -24,10 +24,10 @@ public final class RastriginBasicPSO {
         final boolean IS_FULLY_INFORMED    = true;
         final double  INDIVIDUAL_FACTOR    = 2.05;
         final double  SOCIAL_FACTOR        = 2.05;
-        final double  MIN_VALUE            = -5;
-        final double  MAX_VALUE            = 5;
-        final double  MIN_SPEED            = -5;
-        final double  MAX_SPEED            = 5;
+        final double  MIN_VALUE            = -5.12;
+        final double  MAX_VALUE            = 5.12;
+        final double  MIN_SPEED            = -5.12;
+        final double  MAX_SPEED            = 5.12;
 
         IProblem<RealVector> problem = new FunctionMinimizationProblem<>(new RastriginFunction<>());
 

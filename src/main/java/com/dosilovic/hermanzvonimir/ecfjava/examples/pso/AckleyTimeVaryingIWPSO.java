@@ -29,6 +29,8 @@ public final class AckleyTimeVaryingIWPSO {
         final double  FINAL_INERTIA_WEIGHT   = 0.9;
         final double  MIN_VALUE              = -32;
         final double  MAX_VALUE              = 32;
+        final double  MIN_SPEED              = -2;
+        final double  MAX_SPEED              = 2;
 
         IProblem<RealVector> problem = new FunctionMinimizationProblem<>(new AckleyFunction<>());
 
@@ -36,7 +38,7 @@ public final class AckleyTimeVaryingIWPSO {
         for (int i = 0; i < NUMBER_OF_PARTICLES; i++) {
             initialParticles.add(new Particle<>(
                 new Solution<>(new RealVector(NUMBER_OF_COMPONENTS, MIN_VALUE, MAX_VALUE)),
-                new RealVector(NUMBER_OF_COMPONENTS, MIN_VALUE, MAX_VALUE)
+                new RealVector(NUMBER_OF_COMPONENTS, MIN_SPEED, MAX_SPEED)
             ));
         }
 
@@ -49,6 +51,8 @@ public final class AckleyTimeVaryingIWPSO {
             SOCIAL_FACTOR,
             new RealVector(NUMBER_OF_COMPONENTS, MIN_VALUE),
             new RealVector(NUMBER_OF_COMPONENTS, MAX_VALUE),
+            new RealVector(NUMBER_OF_COMPONENTS, MIN_SPEED),
+            new RealVector(NUMBER_OF_COMPONENTS, MAX_SPEED),
             new LinearCoolingSchedule(MAX_ITERATIONS, INITIAL_INERTIA_WEIGHT, FINAL_INERTIA_WEIGHT),
             problem,
             new FullyConnectedTopology<>()

@@ -21,6 +21,8 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
     protected double       socialFactor;
     protected RealVector   minValue;
     protected RealVector   maxValue;
+    protected RealVector   minSpeed;
+    protected RealVector   maxSpeed;
     protected IProblem<T>  problem;
     protected ITopology<T> topology;
 
@@ -39,6 +41,8 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
         double socialFactor,
         RealVector minValue,
         RealVector maxValue,
+        RealVector minSpeed,
+        RealVector maxSpeed,
         IProblem<T> problem,
         ITopology<T> topology
     ) {
@@ -50,6 +54,8 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
         this.socialFactor = socialFactor;
         this.minValue = minValue;
         this.maxValue = maxValue;
+        this.minSpeed = minSpeed;
+        this.maxSpeed = maxSpeed;
         this.problem = problem;
         this.topology = topology;
     }
@@ -102,7 +108,25 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
             }
 
             for (Particle<T> particle : particles) {
-                updateParticle(iteration, particle, calculateNeighboursContribution(iteration, particle));
+                RealVector speed                 = particle.getCurrentSpeed();
+                T          currentRepresentative = particle.getCurrentSolution().getRepresentative();
+                T          nextRepresentative    = (T) currentRepresentative.clone();
+
+                updateSpeed(iteration, speed, calculateNeighboursContribution(iteration, particle));
+
+                for (int i = 0; i < speed.getSize(); i++) {
+                    double v = speed.getValue(i);
+                    v = Math.max(v, minSpeed.getValue(i));
+                    v = Math.min(v, maxSpeed.getValue(i));
+                    speed.setValue(i, v);
+
+                    double x = currentRepresentative.getValue(i) + v;
+                    x = Math.max(x, minValue.getValue(i));
+                    x = Math.min(x, maxValue.getValue(i));
+                    nextRepresentative.setValue(i, x);
+                }
+
+                particle.setCurrentSolution(new Solution<>(nextRepresentative));
             }
 
             if (iteration == maxIterations) {
@@ -150,7 +174,7 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
         return socialFactor;
     }
 
-    protected abstract void updateParticle(int iteration, Particle<T> particle, RealVector neighboursContribution);
+    protected abstract void updateSpeed(int iteration, RealVector speed, RealVector neighboursContribution);
 
     private RealVector calculateNeighboursContribution(int iteration, Particle<T> particle) {
         double individualFactor = getIndividualFactor(iteration);

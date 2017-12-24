@@ -4,7 +4,6 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopol
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
 
 public class TimeVaryingIWPSO<T extends RealVector> extends AbstractPSO<T> {
 
@@ -19,6 +18,8 @@ public class TimeVaryingIWPSO<T extends RealVector> extends AbstractPSO<T> {
         double socialFactor,
         RealVector minValue,
         RealVector maxValue,
+        RealVector minSpeed,
+        RealVector maxSpeed,
         ICoolingSchedule inertiaWeightSchedule,
         IProblem<T> problem,
         ITopology<T> topology
@@ -32,6 +33,8 @@ public class TimeVaryingIWPSO<T extends RealVector> extends AbstractPSO<T> {
             socialFactor,
             minValue,
             maxValue,
+            minSpeed,
+            maxSpeed,
             problem,
             topology
         );
@@ -39,29 +42,11 @@ public class TimeVaryingIWPSO<T extends RealVector> extends AbstractPSO<T> {
         this.inertiaWeightSchedule = inertiaWeightSchedule;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected void updateParticle(
-        int iteration, Particle<T> particle, RealVector neighboursContribution
-    ) {
-        RealVector speed                 = particle.getCurrentSpeed();
-        T          currentRepresentative = particle.getCurrentSolution().getRepresentative();
-        T          nextRepresentative    = (T) currentRepresentative.clone();
-
+    protected void updateSpeed(int iteration, RealVector speed, RealVector neighboursContribution) {
         double inertiaWeightFactor = inertiaWeightSchedule.getTemperature(iteration);
-        double v, x;
         for (int i = 0; i < speed.getSize(); i++) {
-            v = inertiaWeightFactor * speed.getValue(i) + neighboursContribution.getValue(i);
-            v = Math.max(v, -5); v = Math.min(v, 5);
-
-            x = currentRepresentative.getValue(i) + v;
-            x = Math.max(x, minValue.getValue(i));
-            x = Math.min(x, maxValue.getValue(i));
-
-            speed.setValue(i, v);
-            nextRepresentative.setValue(i, x);
+            speed.setValue(i, inertiaWeightFactor * speed.getValue(i) + neighboursContribution.getValue(i));
         }
-
-        particle.setCurrentSolution(new Solution<>(nextRepresentative));
     }
 }
