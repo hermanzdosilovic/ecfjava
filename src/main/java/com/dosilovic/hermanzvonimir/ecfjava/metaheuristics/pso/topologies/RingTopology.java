@@ -14,7 +14,7 @@ public class RingTopology<T> implements ITopology<T> {
     public RingTopology() {}
 
     public RingTopology(Collection<Particle<T>> particles) {
-        createNeighbourhood(particles);
+        createNeighborhood(particles);
     }
 
     @Override
@@ -24,10 +24,10 @@ public class RingTopology<T> implements ITopology<T> {
 
     @Override
     public void updateTopology(Collection<Particle<T>> particles) {
-        createNeighbourhood(particles);
+        createNeighborhood(particles);
     }
 
-    private void createNeighbourhood(Collection<Particle<T>> particles) {
+    private void createNeighborhood(Collection<Particle<T>> particles) {
         if (neighboursMap == null) {
             neighboursMap = new HashMap<>();
         } else {

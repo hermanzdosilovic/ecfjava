@@ -86,8 +86,7 @@ public class Particle<T> implements Comparable<Particle<T>> {
             return false;
         }
         Particle<?> particle = (Particle<?>) o;
-        return Objects.equals(currentSolution, particle.currentSolution) &&
-               Objects.equals(personalBestSolution, particle.personalBestSolution);
+        return id == particle.id;
     }
 
     @Override

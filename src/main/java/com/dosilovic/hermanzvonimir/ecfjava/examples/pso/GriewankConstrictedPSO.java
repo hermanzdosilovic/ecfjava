@@ -8,7 +8,6 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ConstantCo
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.FunctionMinimizationProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.GriewankFunction;
-import com.dosilovic.hermanzvonimir.ecfjava.numeric.RastriginFunction;
 import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
 
