@@ -6,6 +6,8 @@ import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
 
 public abstract class AbstractBasicPSO<T extends RealVector> extends AbstractPSO<T> {
 
+    private double     individualFactor;
+    private double     socialFactor;
     private RealVector minSpeed;
     private RealVector maxSpeed;
 
@@ -28,20 +30,32 @@ public abstract class AbstractBasicPSO<T extends RealVector> extends AbstractPSO
             desiredFitness,
             desiredPrecision,
             isFullyInformed,
-            individualFactor,
-            socialFactor,
             minValue,
             maxValue,
             problem,
             topology
         );
 
+        this.individualFactor = individualFactor;
+        this.socialFactor = socialFactor;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
     }
 
     @Override
-    protected double limitSpeed(int component, double speed) {
-        return Math.min(Math.max(speed, minSpeed.getValue(component)), maxSpeed.getValue(component));
+    protected double getIndividualFactor(int iteration) {
+        return individualFactor;
+    }
+
+    @Override
+    protected double getSocialFactor(int iteration) {
+        return socialFactor;
+    }
+
+    @Override
+    protected void limitSpeed(int iteration, RealVector speed) {
+        for (int i = 0; i < speed.getSize(); i++) {
+            speed.setValue(i, Math.min(Math.max(speed.getValue(i), minSpeed.getValue(i)), maxSpeed.getValue(i)));
+        }
     }
 }

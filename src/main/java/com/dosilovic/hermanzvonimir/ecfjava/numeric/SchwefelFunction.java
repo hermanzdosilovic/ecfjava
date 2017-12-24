@@ -12,7 +12,7 @@ public class SchwefelFunction<T extends RealVector> implements IFunction<T> {
         double sum = 0;
         for (int i = 0; i < D; i++) {
             x = point.getEntry(i);
-            sum += x * Math.sin(Math.sqrt(x));
+            sum += x * Math.sin(Math.sqrt(Math.abs(x)));
         }
 
         return 418.9829 * D - sum;
