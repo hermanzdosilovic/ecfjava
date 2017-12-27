@@ -17,6 +17,7 @@ public class ElmanNN implements INeuralNetwork {
     private RealVector    context;
     private int           numberOfWeights;
     private int           numberOfParameters;
+    private double[][]    layerOutputs;
 
     private static final Random RAND = new Random();
 
@@ -27,9 +28,12 @@ public class ElmanNN implements INeuralNetwork {
 
         this.architecture = architecture.clone();
         layerActivations = new IActivation[architecture.length];
+        layerOutputs = new double[architecture.length][];
+
         for (int i = 0; i < layerActivations.length; i++) {
             layerActivations[i] = IdentityActivation.getInstance();
         }
+
         setupLayerWeights();
     }
 
@@ -45,6 +49,7 @@ public class ElmanNN implements INeuralNetwork {
 
         this.architecture = architecture.clone();
         this.layerActivations = new IActivation[architecture.length];
+        layerOutputs = new double[architecture.length][];
 
         int start = 0;
         int end   = architecture.length;
@@ -124,16 +129,25 @@ public class ElmanNN implements INeuralNetwork {
 
     @Override
     public double[] forward(double[]... inputs) {
-        double[] output = new double[inputs.length * getOutputSize()];
-        int      offset = 0;
+        int[] offset = new int[architecture.length];
+        for (int i = 0; i < architecture.length; i++) {
+            layerOutputs[i] = new double[inputs.length * architecture[i]];
+        }
 
         for (double[] input : inputs) {
             RealVector vector = new ArrayRealVector(input);
             vector = vector.map(layerActivations[0].getValueFunction()).append(context).append(1.0);
+            for (int i = 0; i < vector.getDimension() - 1; i++) {
+                layerOutputs[0][offset[0]++] = vector.getEntry(i);
+            }
 
             for (int i = 0; i < layerWeights.length; i++) {
                 vector = layerWeights[i].preMultiply(vector);
                 vector = vector.map(layerActivations[i + 1].getValueFunction());
+
+                for (int j = 0; j < vector.getDimension(); j++) {
+                    layerOutputs[i + 1][offset[i + 1]++] = vector.getEntry(j);
+                }
 
                 if (i == 0) {
                     context = vector;
@@ -143,13 +157,19 @@ public class ElmanNN implements INeuralNetwork {
                     vector = vector.append(1.0);
                 }
             }
-
-            for (int i = 0; i < vector.getDimension(); i++) {
-                output[offset++] = vector.getEntry(i);
-            }
         }
 
-        return output;
+        return layerOutputs[architecture.length - 1];
+    }
+
+    @Override
+    public double[] getOutput(int layerIndex) {
+        return layerOutputs[layerIndex];
+    }
+
+    @Override
+    public double[][] getOutput() {
+        return layerOutputs;
     }
 
     private void setupLayerWeights() {

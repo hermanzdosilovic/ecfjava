@@ -23,4 +23,8 @@ public interface INeuralNetwork {
     public void setParameters(double[] parameters);
 
     public double[] forward(double[]... input);
+
+    public double[] getOutput(int layerIndex);
+
+    public double[][] getOutput();
 }
