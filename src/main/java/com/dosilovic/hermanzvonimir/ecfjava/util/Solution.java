@@ -4,6 +4,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class Solution<T> implements Comparable<Solution<T>> {
 
@@ -37,6 +38,12 @@ public class Solution<T> implements Comparable<Solution<T>> {
         hasFitness = true;
     }
 
+    public void setFitness(double fitness, boolean updateIfHasFitness) {
+        if ((hasFitness && updateIfHasFitness) || !hasFitness) {
+            setFitness(fitness);
+        }
+    }
+
     public double getPenalty() {
         return penalty;
     }
@@ -44,6 +51,12 @@ public class Solution<T> implements Comparable<Solution<T>> {
     public void setPenalty(double penalty) {
         this.penalty = penalty;
         hasPenalty = true;
+    }
+
+    public void setPenalty(double penalty, boolean updateIfHasPenalty) {
+        if ((hasPenalty && updateIfHasPenalty) || !hasPenalty) {
+            setPenalty(penalty);
+        }
     }
 
     public boolean hasFitness() {
@@ -55,9 +68,7 @@ public class Solution<T> implements Comparable<Solution<T>> {
     }
 
     public void evaluateFitness(IProblem<T> problem, boolean updateIfHasFitness) {
-        if ((hasFitness && updateIfHasFitness) || !hasFitness) {
-            setFitness(problem.fitness(representative));
-        }
+        setFitness(problem.fitness(representative), updateIfHasFitness);
     }
 
     public void evaluateFitness(IProblem<T> problem) {
@@ -65,9 +76,7 @@ public class Solution<T> implements Comparable<Solution<T>> {
     }
 
     public void evaluatePenalty(IProblem<T> problem, boolean updateIfHasPenalty) {
-        if ((hasPenalty && updateIfHasPenalty) || !hasPenalty) {
-            setPenalty(problem.penalty(representative));
-        }
+        setPenalty(problem.penalty(representative), updateIfHasPenalty);
     }
 
     public void evaluatePenalty(IProblem<T> problem) {
@@ -115,8 +124,10 @@ public class Solution<T> implements Comparable<Solution<T>> {
         IProblem<T> problem,
         boolean updateIfHasFitness
     ) {
+        double[] fitnessValues = problem.fitness(solutions.stream().map(Solution::getRepresentative).collect(Collectors.toList()));
+        int i = 0;
         for (Solution<T> solution : solutions) {
-            solution.evaluateFitness(problem, updateIfHasFitness);
+            solution.setFitness(fitnessValues[i++], updateIfHasFitness);
         }
     }
 
@@ -129,8 +140,10 @@ public class Solution<T> implements Comparable<Solution<T>> {
         IProblem<T> problem,
         boolean updateIfHasPenalty
     ) {
+        double[] penaltyValues = problem.penalty(solutions.stream().map(Solution::getRepresentative).collect(Collectors.toList()));
+        int i = 0;
         for (Solution<T> solution : solutions) {
-            solution.evaluatePenalty(problem, updateIfHasPenalty);
+            solution.setFitness(penaltyValues[i++], updateIfHasPenalty);
         }
     }
 

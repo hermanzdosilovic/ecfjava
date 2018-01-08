@@ -2,7 +2,7 @@ package com.dosilovic.hermanzvonimir.ecfjava.models.problems;
 
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.IFunction;
 
-public class FunctionMaximizationProblem<T> implements IProblem<T> {
+public class FunctionMaximizationProblem<T> extends SingleObjectiveProblem<T> {
 
     private IFunction<T> function;
 

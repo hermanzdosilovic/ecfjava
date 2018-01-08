@@ -2,7 +2,7 @@ package com.dosilovic.hermanzvonimir.ecfjava.models.problems;
 
 import com.dosilovic.hermanzvonimir.ecfjava.util.BitVector;
 
-public class MaxOnesProblem<T extends BitVector> implements IProblem<T> {
+public class MaxOnesProblem<T extends BitVector> extends SingleObjectiveProblem<T> {
 
     @Override
     public double fitness(T individual) {

@@ -7,6 +7,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Particle<T> implements Comparable<Particle<T>> {
 
@@ -99,8 +100,10 @@ public class Particle<T> implements Comparable<Particle<T>> {
         IProblem<T> problem,
         boolean updateIfHasFitness
     ) {
+        double[] fitnessValues = problem.fitness(particles.stream().map(Particle::getCurrentSolution).map(Solution::getRepresentative).collect(Collectors.toList()));
+        int i = 0;
         for (Particle<T> particle : particles) {
-            particle.evaluateFitness(problem, updateIfHasFitness);
+            particle.getCurrentSolution().setFitness(fitnessValues[i++], updateIfHasFitness);
         }
     }
 
@@ -113,8 +116,10 @@ public class Particle<T> implements Comparable<Particle<T>> {
         IProblem<T> problem,
         boolean updateIfHasPenalty
     ) {
+        double[] penaltyValues = problem.penalty(particles.stream().map(Particle::getCurrentSolution).map(Solution::getRepresentative).collect(Collectors.toList()));
+        int i = 0;
         for (Particle<T> particle : particles) {
-            particle.evaluatePenalty(problem, updateIfHasPenalty);
+            particle.getCurrentSolution().setPenalty(penaltyValues[i++], updateIfHasPenalty);
         }
     }
 

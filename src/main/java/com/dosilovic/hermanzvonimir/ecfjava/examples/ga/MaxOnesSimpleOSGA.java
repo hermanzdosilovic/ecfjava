@@ -14,9 +14,6 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.TournamentSelection;
 import com.dosilovic.hermanzvonimir.ecfjava.util.BitVector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 public class MaxOnesSimpleOSGA {
 
     public static void main(String[] args) {
