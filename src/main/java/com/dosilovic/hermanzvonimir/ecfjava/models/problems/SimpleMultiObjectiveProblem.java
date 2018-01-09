@@ -4,8 +4,8 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
 
 public class SimpleMultiObjectiveProblem<T> extends SingleObjectiveProblem<T> {
 
-    protected IProblem<T>[]        problems;
-    protected UnivariateFunction[] functions;
+    private IProblem<T>[]        problems;
+    private UnivariateFunction[] functions;
 
     public SimpleMultiObjectiveProblem(UnivariateFunction[] functions, IProblem<T>... problems) {
         if (functions.length != problems.length) {
