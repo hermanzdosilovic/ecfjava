@@ -21,8 +21,6 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractMetaheuri
     protected IProblem<T>   problem;
     protected ICrossover<T> crossover;
 
-    protected Solution<T> bestSolution;
-
     protected Collection<Solution<T>> initialPopulation;
 
     public AbstractDE(
@@ -120,11 +118,6 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractMetaheuri
         System.err.flush();
 
         return bestSolution.getRepresentative();
-    }
-
-    @Override
-    public Solution<T> getBestSolution() {
-        return bestSolution;
     }
 
     protected abstract Solution<T> createTrialSolution(

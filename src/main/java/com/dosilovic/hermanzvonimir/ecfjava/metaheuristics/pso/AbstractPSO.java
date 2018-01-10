@@ -22,8 +22,6 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
     protected IProblem<T>  problem;
     protected ITopology<T> topology;
 
-    protected Solution<T> bestSolution;
-
     protected Collection<Particle<T>> initialParticles;
 
     private static final Random RAND = new Random();
@@ -143,11 +141,6 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
         System.err.flush();
 
         return bestSolution.getRepresentative();
-    }
-
-    @Override
-    public Solution<T> getBestSolution() {
-        return bestSolution;
     }
 
     protected abstract double getIndividualFactor(int iteration);

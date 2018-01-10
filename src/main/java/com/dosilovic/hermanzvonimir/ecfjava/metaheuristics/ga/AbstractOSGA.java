@@ -28,8 +28,6 @@ public abstract class AbstractOSGA<T> extends AbstractMetaheuristic<T> implement
     protected ICrossover<T> crossover;
     protected IMutation<T>  mutation;
 
-    protected Solution<T> bestSolution;
-
     protected Collection<Solution<T>> initialPopulation;
 
     public AbstractOSGA(
@@ -64,11 +62,6 @@ public abstract class AbstractOSGA<T> extends AbstractMetaheuristic<T> implement
         for (T individual : initialPopulation) {
             this.initialPopulation.add(new Solution<>(individual));
         }
-    }
-
-    @Override
-    public Solution<T> getBestSolution() {
-        return bestSolution;
     }
 
     @Override

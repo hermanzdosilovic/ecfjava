@@ -24,8 +24,6 @@ public abstract class AbstractGA<T> extends AbstractMetaheuristic<T> implements 
     protected ICrossover<T> crossover;
     protected IMutation<T>  mutation;
 
-    protected Solution<T> bestSolution;
-
     protected Collection<Solution<T>> initialPopulation;
 
     public AbstractGA(
@@ -54,11 +52,6 @@ public abstract class AbstractGA<T> extends AbstractMetaheuristic<T> implements 
         for (T individual : initialPopulation) {
             this.initialPopulation.add(new Solution(individual));
         }
-    }
-
-    @Override
-    public Solution<T> getBestSolution() {
-        return bestSolution;
     }
 
     @Override

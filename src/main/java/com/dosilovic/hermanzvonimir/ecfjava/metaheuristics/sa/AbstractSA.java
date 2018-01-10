@@ -18,7 +18,6 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
     protected double           desiredPenalty;
     protected double           desiredPrecision;
 
-    protected Solution<T> bestSolution;
     protected Solution<T> initialSolution;
 
     public AbstractSA(
@@ -40,10 +39,6 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
     @Override
     public void setInitialSolution(final T initialSolution) {
         this.initialSolution = new Solution<>(initialSolution);
-    }
-
-    public Solution<T> getBestSolution() {
-        return bestSolution;
     }
 
     @Override

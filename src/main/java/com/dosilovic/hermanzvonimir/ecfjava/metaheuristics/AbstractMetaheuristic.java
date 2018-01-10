@@ -8,10 +8,17 @@ import java.util.Set;
 
 public abstract class AbstractMetaheuristic<T> implements IMetaheuristic<T> {
 
+    protected Solution<T> bestSolution;
+
     private Set<IObserver<T>> observers;
 
     public AbstractMetaheuristic() {
         observers = new HashSet<>();
+    }
+
+    @Override
+    public Solution<T> getBestSolution() {
+        return bestSolution;
     }
 
     @Override
