@@ -1,9 +1,7 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.mutations;
 
-import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
-
-import java.util.Random;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 public class RealVectorGaussianMutation<T extends RealVector> implements IMutation<T> {
 
@@ -11,38 +9,52 @@ public class RealVectorGaussianMutation<T extends RealVector> implements IMutati
     private double[] sigma;
     private boolean  forceMutation;
 
-    private static final Random RAND = new Random();
-
     public RealVectorGaussianMutation(double mutationProbability, boolean forceMutation, double... sigma) {
         this.mutationProbability = mutationProbability;
         this.sigma = sigma;
         this.forceMutation = forceMutation;
     }
 
+    public RealVectorGaussianMutation(double mutationProbability, boolean forceMutation) {
+        this(mutationProbability, forceMutation, 1);
+    }
+
+    public RealVectorGaussianMutation(double mutationProbability) {
+        this(mutationProbability, true);
+    }
+
+    public RealVectorGaussianMutation() {
+        this(0.5);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    public Solution<T> mutate(Solution<T> individual) {
-        T anteMutant = individual.getRepresentative();
-        T postMutant = (T) anteMutant.clone();
+    public ISolution<T> mutate(ISolution<T> child) {
+        T childRepresentative  = child.getRepresentative();
+        T mutantRepresentative = (T) childRepresentative.copy();
 
         boolean mutationHappened = false;
-        int     i;
-        double  newValue;
-
-        for (i = 0; i < anteMutant.getDimension(); i++) {
-            newValue = postMutant.getEntry(i) + RAND.nextGaussian() * sigma[Math.min(i, sigma.length - 1)];
-            if (RAND.nextDouble() <= mutationProbability) {
+        for (int i = 0; i < mutantRepresentative.getSize(); i++) {
+            if (RAND.nextDouble() < mutationProbability) {
                 mutationHappened = true;
-                postMutant.setEntry(i, newValue);
+                mutantRepresentative.setValue(
+                    i,
+                    mutantRepresentative.getValue(i) + RAND.nextGaussian() * sigma[Math.min(i, sigma.length - 1)]
+                );
             }
         }
 
         if (!mutationHappened && forceMutation) {
-            i = RAND.nextInt(postMutant.getDimension());
-            newValue = postMutant.getEntry(i) + RAND.nextGaussian() * sigma[Math.min(i, sigma.length - 1)];
-            postMutant.setEntry(i, newValue);
+            int i = RAND.nextInt(mutantRepresentative.getDimension());
+            mutantRepresentative.setValue(
+                i,
+                mutantRepresentative.getValue(i) + RAND.nextGaussian() * sigma[Math.min(i, sigma.length - 1)]
+            );
         }
 
-        return new Solution<>(postMutant);
+        ISolution<T> mutant = child.copy();
+        mutant.setRepresentative(mutantRepresentative);
+
+        return mutant;
     }
 }

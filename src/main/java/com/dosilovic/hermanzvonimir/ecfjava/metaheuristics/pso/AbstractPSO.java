@@ -1,38 +1,38 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso;
 
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractMetaheuristic;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractPopulationMetaheuristic;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopology;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particle;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particles;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Random;
+import java.util.List;
 
-public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheuristic<T> implements IParticleSwarmOptimization<T> {
+public abstract class AbstractPSO<T extends RealVector> extends AbstractPopulationMetaheuristic<T> implements IParticleSwarmOptimization<T> {
 
     protected int          maxIterations;
     protected double       desiredFitness;
     protected double       desiredPrecision;
     protected boolean      isFullyInformed;
-    protected RealVector   minValue;
-    protected RealVector   maxValue;
     protected IProblem<T>  problem;
     protected ITopology<T> topology;
 
-    protected Collection<Particle<T>> initialParticles;
+    private List<Particle<T>> particles;
 
-    private static final Random RAND = new Random();
+    protected int iteration;
 
     public AbstractPSO(
         int maxIterations,
         double desiredFitness,
         double desiredPrecision,
         boolean isFullyInformed,
-        RealVector minValue,
-        RealVector maxValue,
         IProblem<T> problem,
         ITopology<T> topology
     ) {
@@ -40,52 +40,50 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
         this.desiredFitness = desiredFitness;
         this.desiredPrecision = desiredPrecision;
         this.isFullyInformed = isFullyInformed;
-        this.minValue = minValue;
-        this.maxValue = maxValue;
         this.problem = problem;
         this.topology = topology;
     }
 
     @Override
-    public T run(Collection<Particle<T>> initialParticles) {
-        setInitialParticles(initialParticles);
-        return run();
+    public void setPopulation(Collection<ISolution<T>> population) {
+        if (population == null || population.isEmpty()) {
+            throw new IllegalArgumentException("Population cannot be null or empty");
+        }
+
+        particles = new ArrayList<>();
+        for (ISolution<T> individual : population) {
+            particles.add((Particle<T>) individual);
+        }
+        topology.updateTopology(particles);
+
+        this.population = new ArrayList<>(population);
     }
 
     @Override
-    public void setInitialParticles(Collection<Particle<T>> initialParticles) {
-        this.initialParticles = initialParticles;
-        topology.updateTopology(initialParticles);
+    public void setBestSolution(ISolution<T> bestSolution) {
+        if (bestSolution == null) {
+            throw new IllegalArgumentException("Best solution cannot be null");
+        } else if (this.bestSolution != bestSolution) {
+            this.bestSolution = bestSolution.copy();
+        }
+        notifyObservers();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public T run() {
+    public ISolution<T> run() {
         long startTime = System.nanoTime();
 
-        if (initialParticles == null) {
-            throw new IllegalStateException("No initial particles");
-        }
+        setPopulation(initialPopulation);
 
-        Collection<Particle<T>> particles = initialParticles;
-
-        int iteration;
         for (iteration = 1; iteration <= maxIterations; iteration++) {
-            Particle.evaluateFitness(particles, problem, true);
-            Particle.updatePersonalBestByFitness(particles);
-            bestSolution = Solution.betterByFitness(
-                bestSolution,
-                Particle.findBestByCurrentFitness(particles).getCurrentSolution()
-            );
-
-            notifyObservers(bestSolution);
+            Solutions.updateFitness(particles, problem);
+            Particles.updateBestSolutionByFitness(particles);
+            setBestSolution(Solutions.betterByFitness(bestSolution, Solutions.findBestByFitness(particles)));
 
             System.err.printf(
-                "Iteration #%d (%s):\n" +
-                "\tbestFitness = %f\n\n",
-                iteration,
-                new Date(),
-                bestSolution.getFitness()
+                "Iteration #%d (%s)\n\tbestFitness: %f\n\n",
+                iteration, new Date(), bestSolution.getFitness()
             );
 
             if (Math.abs(bestSolution.getFitness() - desiredFitness) <= desiredPrecision) {
@@ -94,21 +92,20 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
             }
 
             for (Particle<T> particle : particles) {
-                RealVector speed                 = particle.getCurrentSpeed();
-                T          currentRepresentative = particle.getCurrentSolution().getRepresentative();
-                T          nextRepresentative    = (T) currentRepresentative.clone();
+                T          representative     = particle.getSolution().getRepresentative();
+                RealVector speed              = particle.getSpeed();
+                T          nextRepresentative = (T) representative.copy();
 
                 updateSpeed(iteration, speed, calculateNeighboursContribution(iteration, particle));
                 limitSpeed(iteration, speed);
 
                 for (int i = 0; i < speed.getSize(); i++) {
-                    double x = currentRepresentative.getValue(i) + speed.getValue(i);
-                    x = Math.max(x, minValue.getValue(i));
-                    x = Math.min(x, maxValue.getValue(i));
-                    nextRepresentative.setValue(i, x);
+                    nextRepresentative.setValue(i, representative.getValue(i) + speed.getValue(i));
                 }
 
-                particle.setCurrentSolution(new Solution<>(nextRepresentative));
+                ISolution<T> nextSolution = particle.getSolution().copy();
+                nextSolution.setRepresentative(nextRepresentative);
+                particle.setSolution(nextSolution);
             }
 
             if (iteration == maxIterations) {
@@ -117,30 +114,20 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
             }
         }
 
-        Particle.evaluateFitness(particles, problem, true);
-        Particle.updatePersonalBestByFitness(particles);
-        bestSolution = Solution.betterByFitness(
-            bestSolution,
-            Particle.findBestByCurrentFitness(particles).getCurrentSolution()
-        );
+        Solutions.updateFitness(particles, problem);
+        Particles.updateBestSolutionByFitness(particles);
+        setBestSolution(Solutions.betterByFitness(bestSolution, Solutions.findBestByFitness(particles)));
 
-        notifyObservers(bestSolution);
-
-        long     stopTime = System.nanoTime();
-        Duration duration = Duration.ofNanos(stopTime - startTime);
-
-        System.err.printf("Solution: %s\nFitness: %f\n", bestSolution.getRepresentative(), bestSolution.getFitness());
-        System.err.printf("Iteration: #%d\n", iteration);
+        Duration duration = Duration.ofNanos(System.nanoTime() - startTime);
         System.err.printf(
             "Time: %02d:%02d:%02d.%03d\n\n",
-            duration.toHoursPart(),
-            duration.toMinutesPart(),
-            duration.toSecondsPart(),
-            duration.toMillisPart()
+            duration.toHoursPart(), duration.toMinutesPart(), duration.toSecondsPart(), duration.toMillisPart()
         );
+        System.err.println(bestSolution);
+        System.err.println();
         System.err.flush();
 
-        return bestSolution.getRepresentative();
+        return bestSolution;
     }
 
     protected abstract double getIndividualFactor(int iteration);
@@ -155,39 +142,36 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractMetaheur
         double individualFactor = getIndividualFactor(iteration);
         double socialFactor     = getSocialFactor(iteration);
 
-        T          currentRepresentative  = particle.getCurrentSolution().getRepresentative();
-        RealVector neighboursContribution = (RealVector) currentRepresentative.clone();
+        T          representative         = particle.getSolution().getRepresentative();
+        RealVector neighboursContribution = new RealVector(representative.getSize());
 
         Collection<Particle<T>> neighbours = topology.getNeighbours(particle);
 
         if (isFullyInformed) {
             double factor = (individualFactor + socialFactor) / neighbours.size();
-
-            double pbi, xi, ci;
             for (int i = 0; i < neighboursContribution.getSize(); i++) {
-                ci = 0;
-                xi = currentRepresentative.getValue(i);
+                double ci = 0;
+                double xi = representative.getValue(i);
 
                 for (Particle<T> neighbour : neighbours) {
-                    pbi = neighbour.getPersonalBestSolution().getRepresentative().getValue(i);
+                    double pbi = neighbour.getBestSolution().getRepresentative().getValue(i);
                     ci += factor * RAND.nextDouble() * (pbi - xi);
                 }
 
                 neighboursContribution.setValue(i, ci);
             }
         } else {
-            T personalBestRepresentative = particle.getPersonalBestSolution().getRepresentative();
+            T personalBestRepresentative = particle.getBestSolution().getRepresentative();
             T localBestRepresentative =
-                Particle.findBestByPersonalBestFitness(neighbours).getPersonalBestSolution().getRepresentative();
+                Particles.findBestByBestFitness(neighbours).getBestSolution().getRepresentative();
 
-            double pbi, xi, lbi, ci;
             for (int i = 0; i < neighboursContribution.getSize(); i++) {
-                pbi = personalBestRepresentative.getValue(i);
-                xi = currentRepresentative.getValue(i);
-                lbi = localBestRepresentative.getValue(i);
+                double pbi = personalBestRepresentative.getValue(i);
+                double xi  = representative.getValue(i);
+                double lbi = localBestRepresentative.getValue(i);
 
-                ci = individualFactor * RAND.nextDouble() * (pbi - xi) +
-                     socialFactor * RAND.nextDouble() * (lbi - xi);
+                double ci = individualFactor * RAND.nextDouble() * (pbi - xi) +
+                            socialFactor * RAND.nextDouble() * (lbi - xi);
 
                 neighboursContribution.setValue(i, ci);
             }

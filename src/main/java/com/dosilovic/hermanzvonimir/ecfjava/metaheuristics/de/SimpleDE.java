@@ -2,18 +2,21 @@ package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.de;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.ICrossover;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 public class SimpleDE<T extends RealVector> extends AbstractDE<T> {
 
-    private double scaleFactor;
+    private double            scaleFactor;
+    private Set<ISolution<T>> picked;
 
     private static final Random RAND = new Random();
-
-    private Set<Solution<T>> picked;
 
     public SimpleDE(
         int maxGenerations,
@@ -36,37 +39,39 @@ public class SimpleDE<T extends RealVector> extends AbstractDE<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Solution<T> createTrialSolution(
-        Solution<T> individual, List<Solution<T>> currentPopulation
-    ) {
+    protected ISolution<T> createTrialSolution(ISolution<T> individual) {
         picked.clear();
         picked.add(individual);
 
-        Solution<T> baseVectorSolution   = randomPick(currentPopulation);
-        Solution<T> firstVectorSolution  = randomPick(currentPopulation);
-        Solution<T> secondVectorSolution = randomPick(currentPopulation);
+        ISolution<T> baseVectorSolution   = randomPick();
+        ISolution<T> firstVectorSolution  = randomPick();
+        ISolution<T> secondVectorSolution = randomPick();
 
         T baseVector   = baseVectorSolution.getRepresentative();
         T firstVector  = firstVectorSolution.getRepresentative();
         T secondVector = secondVectorSolution.getRepresentative();
 
-        RealVector tmpVector =
-            new RealVector(firstVector.subtract(secondVector).mapMultiply(scaleFactor).add(baseVector).toArray());
+        RealVector tmpVector = new RealVector(
+            firstVector.subtract(secondVector).mapMultiply(scaleFactor).add(baseVector).toArray()
+        );
 
-        T           mutantVector   = (T) individual.getRepresentative().clone();
-        Solution<T> mutantSolution = new Solution<>(mutantVector);
+        ISolution<T> mutantSolution = individual.copy();
+        T            mutantVector   = (T) individual.getRepresentative().copy();
+
+        mutantSolution.setRepresentative(mutantVector);
+
         for (int i = 0; i < tmpVector.getSize(); i++) {
             mutantVector.setValue(i, tmpVector.getValue(i));
         }
 
-        Collection<Solution<T>> children = crossover.cross(individual, mutantSolution);
-        Solution.evaluateFitness(children, problem);
+        Collection<ISolution<T>> children = crossover.cross(individual, mutantSolution);
+        Solutions.updateFitness(children, problem);
 
-        return Solution.findBestByFitness(children);
+        return Solutions.findBestByFitness(children);
     }
 
-    private Solution<T> randomPick(List<Solution<T>> population) {
-        Solution<T> pick;
+    private ISolution<T> randomPick() {
+        ISolution<T> pick;
         while (true) {
             pick = population.get(RAND.nextInt(population.size()));
             if (!picked.contains(pick)) {

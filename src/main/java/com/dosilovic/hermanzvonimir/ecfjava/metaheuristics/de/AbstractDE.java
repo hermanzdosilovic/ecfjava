@@ -1,18 +1,18 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.de;
 
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractMetaheuristic;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractPopulationMetaheuristic;
 import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.ICrossover;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-public abstract class AbstractDE<T extends RealVector> extends AbstractMetaheuristic<T> implements IDifferentialEvolution<T> {
+public abstract class AbstractDE<T extends RealVector> extends AbstractPopulationMetaheuristic<T> implements IDifferentialEvolution<T> {
 
     protected int    maxGenerations;
     protected double desiredFitness;
@@ -20,8 +20,6 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractMetaheuri
 
     protected IProblem<T>   problem;
     protected ICrossover<T> crossover;
-
-    protected Collection<Solution<T>> initialPopulation;
 
     public AbstractDE(
         int maxGenerations,
@@ -38,33 +36,18 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractMetaheuri
     }
 
     @Override
-    public T run(Collection<Solution<T>> initialPopulation) {
-        setInitialPopulation(initialPopulation);
-        return run();
-    }
-
-    @Override
-    public void setInitialPopulation(Collection<Solution<T>> initialPopulation) {
-        this.initialPopulation = initialPopulation;
-    }
-
-    @Override
-    public T run() {
+    public ISolution<T> run() {
         long startTime = System.nanoTime();
 
-        if (initialPopulation == null) {
-            throw new IllegalStateException("No initial population");
-        }
+        setPopulation(initialPopulation);
 
-        List<Solution<T>> currentPopulation = new ArrayList<>(initialPopulation);
-        List<Solution<T>> nextPopulation    = new ArrayList<>(initialPopulation);
-        List<Solution<T>> tmpPopulation;
+        List<ISolution<T>> nextPopulation = new ArrayList<>(initialPopulation);
+        List<ISolution<T>> tmpPopulation;
 
         int generation;
         for (generation = 1; generation <= maxGenerations; generation++) {
-            Solution.evaluateFitness(currentPopulation, problem);
-            bestSolution = Solution.findBestByFitness(currentPopulation);
-            notifyObservers(bestSolution);
+            Solutions.updateFitness(population, problem);
+            setBestSolution(Solutions.findBestByFitness(population));
 
             System.err.printf(
                 "Generation #%d (%s):\n\tbestFitness = %f\n\n",
@@ -79,8 +62,8 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractMetaheuri
             }
 
             int k = 0;
-            for (Solution<T> individual : currentPopulation) {
-                Solution<T> trialSolution = createTrialSolution(individual, currentPopulation);
+            for (ISolution<T> individual : population) {
+                ISolution<T> trialSolution = createTrialSolution(individual);
                 if (trialSolution.getFitness() >= individual.getFitness()) {
                     nextPopulation.set(k, trialSolution);
                 } else {
@@ -90,8 +73,8 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractMetaheuri
             }
 
             tmpPopulation = nextPopulation;
-            nextPopulation = currentPopulation;
-            currentPopulation = tmpPopulation;
+            nextPopulation = population;
+            population = tmpPopulation;
 
             if (generation == maxGenerations) {
                 System.err.println("Max generations reached.\n");
@@ -99,9 +82,8 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractMetaheuri
             }
         }
 
-        Solution.evaluateFitness(currentPopulation, problem);
-        bestSolution = Solution.findBestByFitness(currentPopulation);
-        notifyObservers(bestSolution);
+        Solutions.updateFitness(population, problem);
+        setBestSolution(Solutions.findBestByFitness(population));
 
         long     stopTime = System.nanoTime();
         Duration duration = Duration.ofNanos(stopTime - startTime);
@@ -117,11 +99,8 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractMetaheuri
         );
         System.err.flush();
 
-        return bestSolution.getRepresentative();
+        return bestSolution;
     }
 
-    protected abstract Solution<T> createTrialSolution(
-        Solution<T> individual,
-        List<Solution<T>> currentPopulation
-    );
+    protected abstract ISolution<T> createTrialSolution(ISolution<T> solution);
 }

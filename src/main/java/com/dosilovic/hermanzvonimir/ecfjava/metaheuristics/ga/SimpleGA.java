@@ -4,16 +4,19 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.ICrossover;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class SimpleGA<T> extends AbstractGA<T> {
 
     public SimpleGA(
         boolean useElitism,
         int maxGenerations,
+        boolean evaluateEveryGeneration,
         double desiredFitness,
         double desiredPrecision,
         IProblem<T> problem,
@@ -24,6 +27,7 @@ public class SimpleGA<T> extends AbstractGA<T> {
         super(
             useElitism,
             maxGenerations,
+            evaluateEveryGeneration,
             desiredFitness,
             desiredPrecision,
             problem,
@@ -34,27 +38,27 @@ public class SimpleGA<T> extends AbstractGA<T> {
     }
 
     @Override
-    protected Collection<Solution<T>> createNextPopulation(Collection<Solution<T>> currentPopulation) {
-        Collection<Solution<T>> nextPopulation = new ArrayList<>(currentPopulation.size());
+    protected List<ISolution<T>> createNextPopulation() {
+        List<ISolution<T>> nextPopulation = new ArrayList<>(population.size());
 
         if (useElitism) {
             nextPopulation.add(bestSolution);
-            nextPopulation.add(Solution.findSecondBestByFitness(currentPopulation));
+            nextPopulation.add(Solutions.findSecondBestByFitness(population));
         }
 
-        while (nextPopulation.size() < currentPopulation.size()) {
-            Solution<T> firstParent  = selection.select(currentPopulation);
-            Solution<T> secondParent = selection.select(currentPopulation);
+        while (nextPopulation.size() < population.size()) {
+            ISolution<T> mom = selection.select(population);
+            ISolution<T> dad = selection.select(population);
 
-            Collection<Solution<T>> children        = crossover.cross(firstParent, secondParent);
-            Collection<Solution<T>> mutatedChildren = new ArrayList<>(children.size());
+            Collection<ISolution<T>> children = crossover.cross(mom, dad);
 
-            for (Solution<T> child : children) {
+            Collection<ISolution<T>> mutatedChildren = new ArrayList<>(children.size());
+            for (ISolution<T> child : children) {
                 mutatedChildren.add(mutation.mutate(child));
             }
 
-            Solution.evaluateFitness(mutatedChildren, problem, true);
-            nextPopulation.add(Solution.findBestByFitness(mutatedChildren));
+            Solutions.updateFitness(mutatedChildren, problem);
+            nextPopulation.add(Solutions.findBestByFitness(mutatedChildren));
         }
 
         return nextPopulation;

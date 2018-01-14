@@ -1,10 +1,6 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa;
 
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.IMetaheuristic;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.IIndividualMetaheuristic;
 
-public interface ISimulatedAnnealing<T> extends IMetaheuristic<T> {
-
-    public T run(T initialSolution);
-
-    public void setInitialSolution(T initialSolution);
+public interface ISimulatedAnnealing<T> extends IIndividualMetaheuristic<T> {
 }

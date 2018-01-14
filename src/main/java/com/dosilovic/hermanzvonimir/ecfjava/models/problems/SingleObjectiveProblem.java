@@ -1,5 +1,7 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.problems;
 
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+
 import java.util.Collection;
 
 public abstract class SingleObjectiveProblem<T> implements IProblem<T> {
@@ -8,13 +10,13 @@ public abstract class SingleObjectiveProblem<T> implements IProblem<T> {
     private double[] penaltyValues;
 
     @Override
-    public double[] fitness(Collection<T> population) {
+    public double[] fitness(Collection<? extends ISolution<T>> population) {
         if (fitnessValues == null || fitnessValues.length != population.size()) {
             fitnessValues = new double[population.size()];
         }
 
         int i = 0;
-        for (T individual : population) {
+        for (ISolution<T> individual : population) {
             fitnessValues[i++] = fitness(individual);
         }
 
@@ -22,13 +24,13 @@ public abstract class SingleObjectiveProblem<T> implements IProblem<T> {
     }
 
     @Override
-    public double[] penalty(Collection<T> population) {
+    public double[] penalty(Collection<? extends ISolution<T>> population) {
         if (penaltyValues == null || penaltyValues.length != population.size()) {
             penaltyValues = new double[population.size()];
         }
 
         int i = 0;
-        for (T individual : population) {
+        for (ISolution<T> individual : population) {
             penaltyValues[i++] = penalty(individual);
         }
 

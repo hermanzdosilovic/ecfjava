@@ -27,4 +27,8 @@ public final class DataUtil {
 
         return data;
     }
+
+    public static double[] normalize(double... data) {
+        return normalize(data, -1, 1);
+    }
 }

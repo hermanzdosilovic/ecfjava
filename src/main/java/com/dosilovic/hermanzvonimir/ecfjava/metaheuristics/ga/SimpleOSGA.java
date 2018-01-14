@@ -5,7 +5,8 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.ICrossover;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
 
 import java.util.*;
 
@@ -14,6 +15,7 @@ public class SimpleOSGA<T> extends AbstractOSGA<T> {
     public SimpleOSGA(
         boolean useElitism,
         int maxGenerations,
+        boolean evaluateEveryGeneration,
         double desiredFitness,
         double desiredPrecision,
         double maxSelectionPressure,
@@ -27,6 +29,7 @@ public class SimpleOSGA<T> extends AbstractOSGA<T> {
         super(
             useElitism,
             maxGenerations,
+            evaluateEveryGeneration,
             desiredFitness,
             desiredPrecision,
             maxSelectionPressure,
@@ -40,46 +43,41 @@ public class SimpleOSGA<T> extends AbstractOSGA<T> {
     }
 
     @Override
-    protected Collection<Solution<T>> createSuccessfulPopulation(
-        Collection<Solution<T>> currentPopulation,
-        Collection<Solution<T>> unsuccessfulPopulation,
-        double comparisonFactor,
-        double successRatio
+    protected Collection<ISolution<T>> createSuccessfulPopulation(
+        List<ISolution<T>> unsuccessfulPopulation
     ) {
-        Collection<Solution<T>> successfulPopulation = new HashSet<>();
-        double                  fitnessLimit;
+        Set<ISolution<T>> successfulPopulation = new HashSet<>();
 
-        while (successfulPopulation.size() < currentPopulation.size() * successRatio &&
-               (successfulPopulation.size() + unsuccessfulPopulation.size()) <
-               currentPopulation.size() * maxSelectionPressure
+        while (successfulPopulation.size() < population.size() * successRatio &&
+               (successfulPopulation.size() + unsuccessfulPopulation.size()) < population.size() * maxSelectionPressure
             ) {
-            Solution<T> firstParent  = selection.select(currentPopulation);
-            Solution<T> secondParent = selection.select(currentPopulation);
+            ISolution<T> mom = selection.select(population);
+            ISolution<T> dad = selection.select(population);
 
-            Collection<Solution<T>> children        = crossover.cross(firstParent, secondParent);
-            List<Solution<T>>       mutatedChildren = new ArrayList<>(children.size());
+            Collection<ISolution<T>> children = crossover.cross(mom, dad);
 
-            for (Solution<T> child : children) {
+            List<ISolution<T>> mutatedChildren = new ArrayList<>(children.size());
+            for (ISolution<T> child : children) {
                 mutatedChildren.add(mutation.mutate(child));
             }
 
-            Solution.evaluateFitness(mutatedChildren, problem);
+            Solutions.updateFitness(mutatedChildren, problem);
             mutatedChildren.sort(null);
 
-            fitnessLimit = Math.min(firstParent.getFitness(), secondParent.getFitness()) +
-                           comparisonFactor * Math.abs(firstParent.getFitness() - secondParent.getFitness());
+            double fitnessLimit = Math.min(mom.getFitness(), dad.getFitness()) +
+                                  comparisonFactor * Math.abs(mom.getFitness() - dad.getFitness());
 
             for (int i = mutatedChildren.size() - 1; i >= 0; i--) {
-                Solution<T> mutatedChild = mutatedChildren.get(i);
+                ISolution<T> mutatedChild = mutatedChildren.get(i);
                 if (mutatedChild.getFitness() > fitnessLimit && !successfulPopulation.contains(mutatedChild)) {
                     successfulPopulation.add(mutatedChild);
                 } else {
                     unsuccessfulPopulation.add(mutatedChild);
                 }
 
-                if (successfulPopulation.size() >= currentPopulation.size() * successRatio ||
+                if (successfulPopulation.size() >= population.size() * successRatio ||
                     (successfulPopulation.size() + unsuccessfulPopulation.size()) >=
-                    currentPopulation.size() * maxSelectionPressure
+                    population.size() * maxSelectionPressure
                     ) {
                     break;
                 }
@@ -90,46 +88,45 @@ public class SimpleOSGA<T> extends AbstractOSGA<T> {
     }
 
     @Override
-    protected Collection<Solution<T>> createNextPopulation(
-        Collection<Solution<T>> currentPopulation,
-        Collection<Solution<T>> successfulPopulation,
-        Collection<Solution<T>> unsuccessfulPopulation
+    protected List<ISolution<T>> createNextPopulation(
+        Collection<ISolution<T>> successfulPopulation,
+        List<ISolution<T>> unsuccessfulPopulation
     ) {
-        Collection<Solution<T>> nextPopulation             = new ArrayList<>(successfulPopulation);
-        List<Solution<T>>       unsuccessfulPopulationList = new ArrayList<>(unsuccessfulPopulation);
-        unsuccessfulPopulationList.sort(null);
+        List<ISolution<T>> nextPopulation = new ArrayList<>(successfulPopulation);
+
+        unsuccessfulPopulation.sort(null);
 
         if (useElitism) {
             nextPopulation.add(bestSolution);
-            nextPopulation.add(Solution.findSecondBestByFitness(currentPopulation));
+            nextPopulation.add(Solutions.findSecondBestByFitness(population));
         }
 
-        for (int i = unsuccessfulPopulationList.size() - 1;
-             i >= 0 && nextPopulation.size() < currentPopulation.size();
-             i--
-            ) {
-            nextPopulation.add(unsuccessfulPopulationList.get(i));
+        for (int i = unsuccessfulPopulation.size() - 1; i >= 0; i--) {
+            if (nextPopulation.size() >= population.size()) {
+                break;
+            }
+            nextPopulation.add(unsuccessfulPopulation.get(i));
         }
 
-        while (nextPopulation.size() < currentPopulation.size()) {
-            Solution<T> firstParent  = selection.select(currentPopulation);
-            Solution<T> secondParent = selection.select(currentPopulation);
+        while (nextPopulation.size() < population.size()) {
+            ISolution<T> mom = selection.select(population);
+            ISolution<T> dad = selection.select(population);
 
-            Collection<Solution<T>> children        = crossover.cross(firstParent, secondParent);
-            List<Solution<T>>       mutatedChildren = new ArrayList<>(children.size());
+            Collection<ISolution<T>> children = crossover.cross(mom, dad);
 
-            for (Solution<T> child : children) {
+            List<ISolution<T>> mutatedChildren = new ArrayList<>(children.size());
+            for (ISolution<T> child : children) {
                 mutatedChildren.add(mutation.mutate(child));
             }
 
-            Solution.evaluateFitness(mutatedChildren, problem);
+            Solutions.updateFitness(mutatedChildren, problem);
             mutatedChildren.sort(null);
 
             for (int i = mutatedChildren.size() - 1; i >= 0; i--) {
-                nextPopulation.add(mutatedChildren.get(i));
-                if (nextPopulation.size() >= currentPopulation.size()) {
+                if (nextPopulation.size() >= population.size()) {
                     break;
                 }
+                nextPopulation.add(mutatedChildren.get(i));
             }
         }
 

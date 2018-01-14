@@ -1,43 +1,47 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.crossovers;
 
-import com.dosilovic.hermanzvonimir.ecfjava.util.IVector;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.IVector;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 
 public class UniformCrossover<T extends IVector> implements ICrossover<T> {
 
-    private double crossoverProbability = 0.5;
-
-    private static final Random RAND = new Random();
+    private double crossoverProbability;
 
     public UniformCrossover(double crossoverProbability) {
         this.crossoverProbability = crossoverProbability;
     }
 
-    public UniformCrossover() {}
+    public UniformCrossover() {
+        this(0.5);
+    }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Collection<Solution<T>> cross(Solution<T> firstParent, Solution<T> secondParent) {
-        T firstParentRepresentative  = firstParent.getRepresentative();
-        T secondParentRepresentative = secondParent.getRepresentative();
+    public Collection<ISolution<T>> cross(ISolution<T> mom, ISolution<T> dad) {
+        T momRepresentative = mom.getRepresentative();
+        T dadRepresentative = dad.getRepresentative();
 
-        Collection<Solution<T>> children    = new ArrayList<>();
-        T                       firstChild  = (T) firstParentRepresentative.clone();
-        T                       secondChild = (T) secondParentRepresentative.clone();
+        ISolution<T> alice               = mom.copy();
+        ISolution<T> bob                 = dad.copy();
+        T            aliceRepresentative = (T) momRepresentative.copy();
+        T            bobRepresentative   = (T) dadRepresentative.copy();
 
-        children.add(new Solution<>(firstChild));
-        children.add(new Solution<>(secondChild));
+        alice.setRepresentative(aliceRepresentative);
+        bob.setRepresentative(bobRepresentative);
 
-        for (int i = 0; i < firstParentRepresentative.getSize(); i++) {
-            if (RAND.nextDouble() <= crossoverProbability) {
-                firstChild.setValue(i, secondParentRepresentative.getValue(i));
-                secondChild.setValue(i, firstParentRepresentative.getValue(i));
+        for (int i = 0; i < momRepresentative.getSize(); i++) {
+            if (RAND.nextDouble() < crossoverProbability) {
+                aliceRepresentative.setValue(i, dadRepresentative.getValue(i));
+                bobRepresentative.setValue(i, momRepresentative.getValue(i));
             }
         }
+
+        Collection<ISolution<T>> children = new ArrayList<>();
+        children.add(alice);
+        children.add(bob);
 
         return children;
     }

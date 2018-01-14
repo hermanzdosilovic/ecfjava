@@ -1,8 +1,12 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.mutations;
 
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+
+import java.util.Random;
 
 public interface IMutation<T> {
 
-    public Solution<T> mutate(Solution<T> individual);
+    Random RAND = new Random();
+
+    ISolution<T> mutate(ISolution<T> child);
 }

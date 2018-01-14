@@ -1,14 +1,12 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.selections;
 
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
 import java.util.Collection;
-import java.util.Random;
 
 public class RouletteWheelSelection<T> implements ISelection<T> {
 
     private boolean useFitness;
-    private static final Random RAND = new Random();
 
     public RouletteWheelSelection(boolean useFitness) {
         this.useFitness = useFitness;
@@ -19,20 +17,21 @@ public class RouletteWheelSelection<T> implements ISelection<T> {
     }
 
     @Override
-    public Solution<T> select(Collection<Solution<T>> population) {
-        double totalFitness = 0;
-        for (Solution<T> individual : population) {
-            totalFitness += useFitness ? individual.getFitness() : individual.getPenalty();
+    public ISolution<T> select(Collection<ISolution<T>> population) {
+        double fitnessSum = 0;
+        for (ISolution<T> individual : population) {
+            fitnessSum += Math.abs(useFitness ? individual.getFitness() : individual.getPenalty());
         }
 
-        double cumulativeFitness = 0;
-        double randomDouble      = RAND.nextDouble();
+        double       cumulativeFitness = 0;
+        double       randomDouble      = RAND.nextDouble();
+        ISolution<T> lastIndividual    = null;
 
-        Solution<T> lastIndividual = null;
-        for (Solution<T> individual : population) {
+        for (ISolution<T> individual : population) {
             lastIndividual = individual;
-            cumulativeFitness += useFitness ? individual.getFitness() : individual.getPenalty();
-            if (randomDouble <= Math.abs(cumulativeFitness / totalFitness)) {
+            cumulativeFitness += Math.abs(useFitness ? individual.getFitness() : individual.getPenalty());
+
+            if (randomDouble < cumulativeFitness / fitnessSum) {
                 return individual;
             }
         }

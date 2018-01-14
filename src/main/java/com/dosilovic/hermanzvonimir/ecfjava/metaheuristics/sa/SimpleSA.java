@@ -3,7 +3,7 @@ package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
 import java.util.Random;
 
@@ -30,37 +30,27 @@ public class SimpleSA<T> extends AbstractSA<T> {
     }
 
     @Override
-    protected Solution<T> onOuterTemperatureStart(
-        Solution<T> currentSolution,
-        double outerTemperature
-    ) {
-        return currentSolution;
+    protected ISolution<T> onOuterTemperatureStart(double outerTemperature) {
+        return solution;
     }
 
     @Override
-    protected Solution<T> onInnerTemperatureStart(
-        Solution<T> currentSolution,
-        double outerTemperature,
-        double innerTemperature
-    ) {
-        return currentSolution;
+    protected ISolution<T> onInnerTemperatureStart(double outerTemperature, double innerTemperature) {
+        return solution;
     }
 
     @Override
-    protected Solution<T> selectNextSolution(
-        Solution<T> currentSolution,
-        Solution<T> neighbourSolution,
-        double outerTemperature,
-        double innerTemperature
+    protected ISolution<T> selectNextSolution(
+        ISolution<T> neighbourSolution, double outerTemperature, double innerTemperature
     ) {
-        double penaltyDiff = neighbourSolution.getPenalty() - currentSolution.getPenalty();
+        double penaltyDiff = neighbourSolution.getPenalty() - solution.getPenalty();
 
         if (penaltyDiff <= 0) {
             return neighbourSolution;
-        } else if (RAND.nextDouble() <= Math.exp(-1.0 * penaltyDiff / outerTemperature)) {
+        } else if (RAND.nextDouble() < Math.exp(-1.0 * penaltyDiff / outerTemperature)) {
             return neighbourSolution;
         }
 
-        return currentSolution;
+        return solution;
     }
 }

@@ -1,14 +1,16 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.problems;
 
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+
 import java.util.Collection;
 
 public interface IProblem<T> {
 
-    public double fitness(T individual);
+    double fitness(ISolution<T> individual);
 
-    public double penalty(T individual);
+    double penalty(ISolution<T> individual);
 
-    public double[] fitness(Collection<T> population);
+    double[] fitness(Collection<? extends ISolution<T>> population);
 
-    public double[] penalty(Collection<T> population);
+    double[] penalty(Collection<? extends ISolution<T>> population);
 }

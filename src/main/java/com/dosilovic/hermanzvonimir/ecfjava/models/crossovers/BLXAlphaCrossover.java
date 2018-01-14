@@ -1,42 +1,44 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.crossovers;
 
-import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 
 public class BLXAlphaCrossover<T extends RealVector> implements ICrossover<T> {
 
     private double alpha;
-    private static final Random RAND = new Random();
 
     public BLXAlphaCrossover(double alpha) {
         this.alpha = alpha;
     }
 
+    public BLXAlphaCrossover() {
+        this(0);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    public Collection<Solution<T>> cross(Solution<T> firstParent, Solution<T> secondParent) {
-        T firstRepresentative  = firstParent.getRepresentative();
-        T secondRepresentative = secondParent.getRepresentative();
+    public Collection<ISolution<T>> cross(ISolution<T> mom, ISolution<T> dad) {
+        T momRepresentative = mom.getRepresentative();
+        T dadRepresentative = dad.getRepresentative();
 
-        T child = (T) firstRepresentative.clone();
+        ISolution<T> child               = dad.copy();
+        T            childRepresentative = (T) dadRepresentative.copy();
 
-        double cmin;
-        double cmax;
-        double I;
+        child.setRepresentative(childRepresentative);
 
-        for (int i = 0; i < child.getDimension(); i++) {
-            cmin = Math.min(firstRepresentative.getEntry(i), secondRepresentative.getEntry(i));
-            cmax = Math.max(firstRepresentative.getEntry(i), secondRepresentative.getEntry(i));
+        double cmin, cmax, I;
+        for (int i = 0; i < childRepresentative.getSize(); i++) {
+            cmin = Math.min(momRepresentative.getValue(i), dadRepresentative.getValue(i));
+            cmax = Math.max(momRepresentative.getValue(i), dadRepresentative.getValue(i));
             I = cmax - cmin;
-            child.setEntry(i, (cmin - I * alpha) + RAND.nextDouble() * I * (1 + 2 * alpha));
+            childRepresentative.setEntry(i, (cmin - I * alpha) + RAND.nextDouble() * I * (1 + 2 * alpha));
         }
 
-        Collection<Solution<T>> children = new ArrayList<>();
-        children.add(new Solution<>(child));
+        Collection<ISolution<T>> children = new ArrayList<>();
+        children.add(child);
 
         return children;
     }

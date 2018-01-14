@@ -1,7 +1,5 @@
-package com.dosilovic.hermanzvonimir.ecfjava.util;
+package com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
 
 public class BitVector implements IVector<Boolean> {
@@ -24,13 +22,19 @@ public class BitVector implements IVector<Boolean> {
         this(bitVector.bits);
     }
 
-    public BitVector(int size, boolean setBitsAtRandom) {
+    public BitVector(int size, boolean initialValue) {
         this(size);
-        if (!setBitsAtRandom) {
-            return;
-        }
         for (int i = 0; i < size; i++) {
-            setValue(i, RAND.nextBoolean());
+            setValue(i, initialValue);
+        }
+    }
+
+    public BitVector(int size, Boolean setBitsAtRandom) {
+        this(size);
+        if (setBitsAtRandom) {
+            for (int i = 0; i < size; i++) {
+                setValue(i, RAND.nextBoolean());
+            }
         }
     }
 
@@ -55,6 +59,11 @@ public class BitVector implements IVector<Boolean> {
         return bits.length;
     }
 
+    @Override
+    public BitVector copy() {
+        return new BitVector(this);
+    }
+
     public void flip(int index) {
         setValue(index, !bits[index]);
     }
@@ -63,23 +72,9 @@ public class BitVector implements IVector<Boolean> {
         return cardinality;
     }
 
-    private void countNumberOfSetBits() {
-        for (int i = 0; i < bits.length; i++) {
-            if (bits[i]) {
-                cardinality++;
-            }
-        }
-    }
-
-    @Override
-    public Object clone() {
-        return new BitVector(this);
-    }
-
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder("{");
-
         for (int i = 0; i < bits.length; i++) {
             stringBuilder.append(bits[i]);
             if (i + 1 != bits.length) {
@@ -87,23 +82,14 @@ public class BitVector implements IVector<Boolean> {
             }
         }
         stringBuilder.append("}");
-
         return stringBuilder.toString();
     }
 
-    public static Collection<BitVector> createCollection(int collectionSize, int vectorSize) {
-        return createCollection(collectionSize, vectorSize, false);
-    }
-
-    public static Collection<BitVector> createCollection(
-        int collectionSize,
-        int vectorSize,
-        boolean setBitsAtRandom
-    ) {
-        Collection<BitVector> collection = new ArrayList<>(collectionSize);
-        for (int i = 0; i < collectionSize; i++) {
-            collection.add(new BitVector(vectorSize, setBitsAtRandom));
+    private void countNumberOfSetBits() {
+        for (boolean bit : bits) {
+            if (bit) {
+                cardinality++;
+            }
         }
-        return collection;
     }
 }

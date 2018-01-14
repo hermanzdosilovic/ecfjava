@@ -1,15 +1,15 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa;
 
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractMetaheuristic;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractIndividualMetaheuristic;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
 import java.time.Duration;
 import java.util.Date;
 
-public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements ISimulatedAnnealing<T> {
+public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> implements ISimulatedAnnealing<T> {
 
     protected IProblem<T>      problem;
     protected IMutation<T>     mutation;
@@ -17,8 +17,6 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
     protected ICoolingSchedule innerCoolingSchedule;
     protected double           desiredPenalty;
     protected double           desiredPrecision;
-
-    protected Solution<T> initialSolution;
 
     public AbstractSA(
         double desiredPenalty,
@@ -37,63 +35,51 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
     }
 
     @Override
-    public void setInitialSolution(final T initialSolution) {
-        this.initialSolution = new Solution<>(initialSolution);
-    }
-
-    @Override
-    public T run(T initialSolution) {
-        setInitialSolution(initialSolution);
-        return run();
-    }
-
-    @Override
-    public T run() {
+    public ISolution<T> run() {
         long startTime = System.nanoTime();
+
+        setSolution(initialSolution);
 
         if (initialSolution == null) {
             throw new IllegalStateException("No initial solution");
         }
 
-        Solution<T> currentSolution = initialSolution;
-        bestSolution = initialSolution;
+        bestSolution = solution;
 
-        currentSolution.evaluatePenalty(problem);
+        solution.updatePenalty(problem);
 
         for (double outerTemperature : outerCoolingSchedule) {
-            currentSolution = onOuterTemperatureStart(currentSolution, outerTemperature);
-            notifyObservers(currentSolution);
+            solution = onOuterTemperatureStart(outerTemperature);
+            notifyObservers();
 
             System.err.printf(
-                "Temperature %f (%s):\n" +
-                "\tbestPenalty    = %f\n" +
-                "\tcurrentPenalty = %f\n\n",
+                "Temperature %f (%s)\n" +
+                "\t   bestPenalty: %f\n" +
+                "\tcurrentPenalty: %f\n\n",
                 outerTemperature,
                 new Date(),
                 bestSolution.getPenalty(),
-                currentSolution.getPenalty()
+                solution.getPenalty()
             );
 
 
             for (double innerTemperature : innerCoolingSchedule) {
-                currentSolution = onInnerTemperatureStart(
-                    currentSolution,
+                solution = onInnerTemperatureStart(
                     outerTemperature,
                     innerTemperature
                 );
 
-                Solution<T> neighborSolution = mutation.mutate(currentSolution);
-                neighborSolution.evaluatePenalty(problem);
+                ISolution<T> neighborSolution = mutation.mutate(solution);
+                neighborSolution.updatePenalty(problem);
 
-                currentSolution = selectNextSolution(
-                    currentSolution,
+                solution = selectNextSolution(
                     neighborSolution,
                     outerTemperature,
                     innerTemperature
                 );
 
-                if (currentSolution.getPenalty() <= bestSolution.getPenalty()) {
-                    bestSolution = currentSolution;
+                if (solution.getPenalty() <= bestSolution.getPenalty()) {
+                    bestSolution = solution;
                 }
 
                 if (Math.abs(bestSolution.getPenalty() - desiredPenalty) <= desiredPrecision) {
@@ -107,10 +93,7 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
             }
         }
 
-        long     stopTime = System.nanoTime();
-        Duration duration = Duration.ofNanos(stopTime - startTime);
-
-        System.err.printf("Solution: %s\nPenalty: %f\n", bestSolution.getRepresentative(), bestSolution.getPenalty());
+        Duration duration = Duration.ofNanos(System.nanoTime() - startTime);
         System.err.printf(
             "Time: %02d:%02d:%02d.%03d\n\n",
             duration.toHoursPart(),
@@ -118,26 +101,18 @@ public abstract class AbstractSA<T> extends AbstractMetaheuristic<T> implements 
             duration.toSecondsPart(),
             duration.toMillisPart()
         );
+        System.err.println(bestSolution);
+        System.err.println();
         System.err.flush();
 
-        return bestSolution.getRepresentative();
+        return bestSolution;
     }
 
-    protected abstract Solution<T> onOuterTemperatureStart(
-        Solution<T> currentSolution,
-        double outerTemperature
-    );
+    protected abstract ISolution<T> onOuterTemperatureStart(double outerTemperature);
 
-    protected abstract Solution<T> onInnerTemperatureStart(
-        Solution<T> currentSolution,
-        double outerTemperature,
-        double innerTemperature
-    );
+    protected abstract ISolution<T> onInnerTemperatureStart(double outerTemperature, double innerTemperature);
 
-    protected abstract Solution<T> selectNextSolution(
-        Solution<T> currentSolution,
-        Solution<T> nextSolution,
-        double outerTemperature,
-        double innerTemperature
+    protected abstract ISolution<T> selectNextSolution(
+        ISolution<T> nextSolution, double outerTemperature, double innerTemperature
     );
 }

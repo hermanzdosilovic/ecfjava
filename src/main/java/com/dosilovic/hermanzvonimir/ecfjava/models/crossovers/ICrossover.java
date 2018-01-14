@@ -1,10 +1,13 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.crossovers;
 
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
 import java.util.Collection;
+import java.util.Random;
 
 public interface ICrossover<T> {
 
-    public Collection<Solution<T>> cross(Solution<T> firstParent, Solution<T> secondParent);
+    Random RAND = new Random();
+
+    Collection<ISolution<T>> cross(ISolution<T> mom, ISolution<T> dad);
 }

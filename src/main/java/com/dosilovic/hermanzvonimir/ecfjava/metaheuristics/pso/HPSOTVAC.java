@@ -3,7 +3,7 @@ package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopology;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 public class HPSOTVAC<T extends RealVector> extends AbstractPSO<T> {
 
@@ -19,8 +19,6 @@ public class HPSOTVAC<T extends RealVector> extends AbstractPSO<T> {
         boolean isFullyInformed,
         ICoolingSchedule individualFactorSchedule,
         ICoolingSchedule socialFactorSchedule,
-        RealVector minValue,
-        RealVector maxValue,
         ICoolingSchedule minSpeedSchedule,
         ICoolingSchedule maxSpeedSchedule,
         IProblem<T> problem,
@@ -31,8 +29,6 @@ public class HPSOTVAC<T extends RealVector> extends AbstractPSO<T> {
             desiredFitness,
             desiredPrecision,
             isFullyInformed,
-            minValue,
-            maxValue,
             problem,
             topology
         );
@@ -54,9 +50,7 @@ public class HPSOTVAC<T extends RealVector> extends AbstractPSO<T> {
     }
 
     @Override
-    protected void updateSpeed(
-        int iteration, RealVector speed, RealVector neighboursContribution
-    ) {
+    protected void updateSpeed(int iteration, RealVector speed, RealVector neighboursContribution) {
         for (int i = 0; i < speed.getSize(); i++) {
             speed.setValue(i, speed.getValue(i) + neighboursContribution.getValue(i));
         }
@@ -64,11 +58,10 @@ public class HPSOTVAC<T extends RealVector> extends AbstractPSO<T> {
 
     @Override
     protected void limitSpeed(int iteration, RealVector speed) {
-        double vmax = maxSpeedSchedule.getTemperature(iteration);
-        double vmin = minSpeedSchedule.getTemperature(iteration);
-
+        double minSpeed = minSpeedSchedule.getTemperature(iteration);
+        double maxSpeed = maxSpeedSchedule.getTemperature(iteration);
         for (int i = 0; i < speed.getSize(); i++) {
-            speed.setValue(i, Math.min(Math.max(speed.getValue(i), vmin), vmax));
+            speed.setValue(i, Math.min(Math.max(speed.getValue(i), minSpeed), maxSpeed));
         }
     }
 }

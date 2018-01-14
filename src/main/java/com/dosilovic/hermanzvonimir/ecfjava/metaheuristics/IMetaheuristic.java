@@ -1,17 +1,19 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics;
 
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.util.IObserver;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
 public interface IMetaheuristic<T> {
 
-    public T run();
+    ISolution<T> run();
 
-    public Solution<T> getBestSolution();
+    ISolution<T> getBestSolution();
 
-    public void attachObserver(IObserver observer);
+    void setBestSolution(ISolution<T> bestSolution);
 
-    public void detachObserver(IObserver observer);
+    void attachObserver(IObserver<T> observer);
 
-    public void notifyObservers(Solution<T> solution);
+    void detachObserver(IObserver<T> observer);
+
+    void notifyObservers();
 }

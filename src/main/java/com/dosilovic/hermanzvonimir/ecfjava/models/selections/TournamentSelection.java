@@ -1,34 +1,59 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.selections;
 
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 public class TournamentSelection<T> implements ISelection<T> {
 
     private int     size;
-    private boolean allowRepeat;
-    private static final Random RAND = new Random();
+    private boolean isUniqueTournament;
+    private boolean useFitness;
 
-    public TournamentSelection(int size, boolean allowRepeat) {
+    public TournamentSelection(int size, boolean isUniqueTournament, boolean useFitness) {
         this.size = size;
-        this.allowRepeat = allowRepeat;
+        this.isUniqueTournament = isUniqueTournament;
+        this.useFitness = useFitness;
+    }
+
+    public TournamentSelection(int size, boolean isUniqueTournament) {
+        this(size, isUniqueTournament, true);
+    }
+
+    public TournamentSelection(int size) {
+        this(size, true);
+    }
+
+    public TournamentSelection() {
+        this(3);
     }
 
     @Override
-    public Solution<T> select(Collection<Solution<T>> population) {
-        List<Solution<T>> tournamentCandidates = new LinkedList<>(population);
-        List<Solution<T>> competitors          = new ArrayList<>(size);
+    public ISolution<T> select(Collection<ISolution<T>> population) {
+        List<ISolution<T>> competitors = new ArrayList<>(population.size());
+        if (isUniqueTournament) {
+            competitors.addAll(new HashSet<>(population));
+        } else {
+            competitors.addAll(population);
+        }
 
-        while (competitors.size() < size && tournamentCandidates.size() != 0) {
-            int index = RAND.nextInt(tournamentCandidates.size());
-            competitors.add(tournamentCandidates.get(index));
-
-            if (!allowRepeat) {
-                tournamentCandidates.remove(index);
+        ISolution<T> best = null;
+        ISolution<T> competitor;
+        for (int i = 0; i < size; i++) {
+            competitor = competitors.get(RAND.nextInt(competitors.size()));
+            if (best == null) {
+                best = competitor;
+            } else if (useFitness) {
+                best = Solutions.betterByFitness(best, competitor);
+            } else {
+                best = Solutions.betterByPenalty(best, competitor);
             }
         }
 
-        return Solution.findBestByFitness(competitors);
+        return best;
     }
 }

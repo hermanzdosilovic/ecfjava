@@ -1,6 +1,6 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies;
 
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.Particle;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particle;
 
 import java.util.*;
 

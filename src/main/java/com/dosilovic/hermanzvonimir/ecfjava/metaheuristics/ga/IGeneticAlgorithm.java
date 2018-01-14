@@ -1,12 +1,14 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.ga;
 
-import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.IMetaheuristic;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.IPopulationMetaheuristic;
 
-import java.util.Collection;
+public interface IGeneticAlgorithm<T> extends IPopulationMetaheuristic<T> {
 
-public interface IGeneticAlgorithm<T> extends IMetaheuristic<T> {
+    int getGeneration();
 
-    public T run(Collection<T> initialPopulation);
+    void setGeneration(int generation);
 
-    public void setInitialPopulation(Collection<T> initialPopulation);
+    int getMaxGenerations();
+
+    void setMaxGenerations(int maxGenerations);
 }

@@ -1,42 +1,47 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.mutations;
 
-import com.dosilovic.hermanzvonimir.ecfjava.util.BitVector;
-import com.dosilovic.hermanzvonimir.ecfjava.util.Solution;
-
-import java.util.Random;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.BitVector;
 
 public class BitVectorStochasticMutation<T extends BitVector> implements IMutation<T> {
 
     private double  mutationProbability;
     private boolean forceMutation;
-    private static final Random RAND = new Random();
 
     public BitVectorStochasticMutation(double mutationProbability, boolean forceMutation) {
         this.mutationProbability = mutationProbability;
         this.forceMutation = forceMutation;
     }
 
+    public BitVectorStochasticMutation(double mutationProbability) {
+        this(mutationProbability, true);
+    }
+
+    public BitVectorStochasticMutation() {
+        this(0.5);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    public Solution<T> mutate(Solution<T> solution) {
-        T anteMutant = solution.getRepresentative();
-        T postMutant = (T) anteMutant.clone();
+    public ISolution<T> mutate(ISolution<T> child) {
+        T childRepresentative  = child.getRepresentative();
+        T mutantRepresentative = (T) childRepresentative.copy();
 
         boolean mutationHappened = false;
-        int     i;
-
-        for (i = 0; i < postMutant.getSize(); i++) {
-            if (RAND.nextDouble() <= mutationProbability) {
+        for (int i = 0; i < mutantRepresentative.getSize(); i++) {
+            if (RAND.nextDouble() < mutationProbability) {
                 mutationHappened = true;
-                postMutant.flip(i);
+                mutantRepresentative.flip(i);
             }
         }
 
         if (!mutationHappened && forceMutation) {
-            i = RAND.nextInt(postMutant.getSize());
-            postMutant.flip(i);
+            mutantRepresentative.flip(RAND.nextInt(mutantRepresentative.getSize()));
         }
 
-        return new Solution<>(postMutant);
+        ISolution<T> mutant = child.copy();
+        mutant.setRepresentative(mutantRepresentative);
+
+        return mutant;
     }
 }

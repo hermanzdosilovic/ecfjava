@@ -2,7 +2,7 @@ package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso;
 
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopology;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 public abstract class AbstractBasicPSO<T extends RealVector> extends AbstractPSO<T> {
 
@@ -18,8 +18,6 @@ public abstract class AbstractBasicPSO<T extends RealVector> extends AbstractPSO
         boolean isFullyInformed,
         double individualFactor,
         double socialFactor,
-        RealVector minValue,
-        RealVector maxValue,
         RealVector minSpeed,
         RealVector maxSpeed,
         IProblem<T> problem,
@@ -30,12 +28,9 @@ public abstract class AbstractBasicPSO<T extends RealVector> extends AbstractPSO
             desiredFitness,
             desiredPrecision,
             isFullyInformed,
-            minValue,
-            maxValue,
             problem,
             topology
         );
-
         this.individualFactor = individualFactor;
         this.socialFactor = socialFactor;
         this.minSpeed = minSpeed;

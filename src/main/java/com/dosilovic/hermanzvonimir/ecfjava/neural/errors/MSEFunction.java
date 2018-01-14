@@ -3,7 +3,7 @@ package com.dosilovic.hermanzvonimir.ecfjava.neural.errors;
 import com.dosilovic.hermanzvonimir.ecfjava.neural.INeuralNetwork;
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.IFunction;
 import com.dosilovic.hermanzvonimir.ecfjava.util.DatasetEntry;
-import com.dosilovic.hermanzvonimir.ecfjava.util.RealVector;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 public class MSEFunction<T extends RealVector> implements IFunction<T> {
 
