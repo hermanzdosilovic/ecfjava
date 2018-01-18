@@ -1,207 +1,208 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.problems;
 
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
-public class MultiObjectiveProblem<T extends RealVector> { //} implements IProblem<T> {
+import java.util.*;
 
-//    private IProblem<T>[]                  problems;
-//    private double                         alpha;
-//    private double                         sigmaShare;
-//    private double                         epsilon;
-//    private boolean                        useSolutionSpace;
-//    private SimpleMultiObjectiveProblem<T> simpleMultiObjectiveProblem;
-//
-//    private double[] fitnessValues;
-//    private double[] penaltyValues;
-//
-//    public MultiObjectiveProblem(
-//        double alpha,
-//        double sigmaShare,
-//        double epsilon,
-//        boolean useSolutionSpace,
-//        IProblem<T>... problems
-//    ) {
-//        this.problems = problems;
-//        this.alpha = alpha;
-//        this.sigmaShare = sigmaShare;
-//        this.epsilon = epsilon;
-//        this.useSolutionSpace = useSolutionSpace;
-//        this.simpleMultiObjectiveProblem = new SimpleMultiObjectiveProblem<>(problems);
-//    }
-//
-//    @Override
-//    public double fitness(ISolution<T> individual) {
-//        return simpleMultiObjectiveProblem.fitness(individual);
-//    }
-//
-//    @Override
-//    public double penalty(ISolution<T> individual) {
-//        return simpleMultiObjectiveProblem.penalty(individual);
-//    }
-//
-//    @Override
-//    public double[] fitness(Collection<ISolution<T>> population) {
-//        if (fitnessValues == null || fitnessValues.length != population.size()) {
-//            fitnessValues = new double[population.size()];
-//        }
-//
-//        evaluate(population, true, fitnessValues);
-//
-//        return fitnessValues;
-//    }
-//
-//    @Override
-//    public double[] penalty(Collection<ISolution<T>> population) {
-//        if (penaltyValues == null || penaltyValues.length != population.size()) {
-//            penaltyValues = new double[population.size()];
-//        }
-//
-//        evaluate(population, false, penaltyValues);
-//
-//        return penaltyValues;
-//    }
-//
-//    private void evaluate(Collection<ISolution<T>> population, boolean useFitness, double[] result) {
-//        Map<T, Double> resultMap = new HashMap<>(population.size());
-//
-//        List<Collection<T>> sortedPopulation = notDominatedSorting(population, useFitness);
-//        double              fmin             = population.size() + epsilon;
-//
-//        for (Collection<T> subPopulation : sortedPopulation) {
-//
-//            double newFmin = Double.MAX_VALUE;
-//            for (T individual : subPopulation) {
-//                double f  = fmin - epsilon;
-//                double nc = nicheDensity(individual, subPopulation, useFitness);
-//
-//                f /= nc;
-//
-//                newFmin = Math.min(newFmin, f);
-//
-//                resultMap.put(individual, f);
-//            }
-//
-//            fmin = newFmin;
-//        }
-//
-//        int i = 0;
-//        for (T individual : population) {
-//            result[i++] = resultMap.get(individual);
-//        }
-//
-//        return;
-//    }
-//
-//    private boolean dominates(T a, T b, boolean useFitness) {
-//        RealVector x = getResult(a, useFitness);
-//        RealVector y = getResult(b, useFitness);
-//
-//        boolean dominatesForEachComponent = true;
-//        for (int i = 0; i < x.getSize(); i++) {
-//            if (useFitness) {
-//                if (!(x.getValue(i) >= y.getValue(i))) {
-//                    dominatesForEachComponent = false;
-//                    break;
-//                }
-//            } else {
-//                if (!(x.getValue(i) <= y.getValue(i))) {
-//                    dominatesForEachComponent = false;
-//                    break;
-//                }
-//            }
-//        }
-//
-//        boolean dominatesForSingleComponent = false;
-//        for (int i = 0; i < x.getSize(); i++) {
-//            if (useFitness) {
-//                if (y.getValue(i) > x.getValue(i)) {
-//                    dominatesForSingleComponent = false;
-//                    break;
-//                } else if (x.getValue(i) > y.getValue(i)) {
-//                    dominatesForSingleComponent = true;
-//                }
-//            } else {
-//                if (y.getValue(i) < x.getValue(i)) {
-//                    dominatesForSingleComponent = false;
-//                    break;
-//                } else if (x.getValue(i) < y.getValue(i)) {
-//                    dominatesForSingleComponent = true;
-//                }
-//            }
-//        }
-//
-//        return dominatesForEachComponent | dominatesForSingleComponent;
-//    }
-//
-//    private Collection<T> findNotDominatedIndividuals(Collection<T> population, boolean useFitness) {
-//        List<T> notDominated = new ArrayList<>();
-//
-//        for (T a : population) {
-//            boolean hasDominator = false;
-//
-//            for (T b : population) {
-//                if (dominates(b, a, useFitness)) {
-//                    hasDominator = true;
-//                    break;
-//                }
-//            }
-//
-//            if (!hasDominator) {
-//                notDominated.add(a);
-//            }
-//        }
-//
-//        return notDominated;
-//    }
-//
-//    private List<Collection<T>> notDominatedSorting(Collection<T> population, boolean useFitness) {
-//        List<T>             populationList = new ArrayList<>(population);
-//        List<Collection<T>> sorted         = new ArrayList<>();
-//
-//        while (!populationList.isEmpty()) {
-//            Collection<T> notDominated = findNotDominatedIndividuals(populationList, useFitness);
-//            if (notDominated.isEmpty()) {
-//                sorted.add(populationList);
-//                break;
-//            }
-//            sorted.add(notDominated);
-//            populationList.removeAll(notDominated);
-//        }
-//
-//        return sorted;
-//    }
-//
-//    private double getDistance(T first, T second, boolean useFitness) {
-//        RealVector a = first;
-//        RealVector b = second;
-//
-//        if (!useSolutionSpace) {
-//            a = getResult(first, useFitness);
-//            b = getResult(second, useFitness);
-//        }
-//
-//        return a.getDistance(b);
-//    }
-//
-//    private double nicheDensity(T individual, Collection<T> population, boolean useFitness) {
-//        double nc = 0;
-//        double d;
-//
-//        for (T neighbor : population) {
-//            d = getDistance(individual, neighbor, useFitness);
-//            if (d < sigmaShare) {
-//                nc += 1 - Math.pow(d / sigmaShare, alpha);
-//            }
-//        }
-//
-//        return nc;
-//    }
+public class MultiObjectiveProblem<T extends RealVector> implements IProblem<T> {
 
-//    private RealVector getResult(T solution, boolean useFitness) {
-//        RealVector result = new RealVector(problems.length);
-//        for (int i = 0; i < problems.length; i++) {
-//            result.setValue(i, useFitness ? problems[i].fitness(solution) : problems[i].penalty(solution));
-//        }
-//        return result;
-//    }
+    private IProblem<T>[]                  problems;
+    private double                         alpha;
+    private double                         sigmaShare;
+    private double                         epsilon;
+    private boolean                        useSolutionSpace;
+    private SimpleMultiObjectiveProblem<T> simpleMultiObjectiveProblem;
+
+    private double[] fitnessValues;
+    private double[] penaltyValues;
+
+    private boolean  useFitness;
+    private double[] values;
+
+    public MultiObjectiveProblem(
+        double alpha,
+        double sigmaShare,
+        double epsilon,
+        boolean useSolutionSpace,
+        IProblem<T>... problems
+    ) {
+        this.problems = problems;
+        this.alpha = alpha;
+        this.sigmaShare = sigmaShare;
+        this.epsilon = epsilon;
+        this.useSolutionSpace = useSolutionSpace;
+        this.simpleMultiObjectiveProblem = new SimpleMultiObjectiveProblem<>(problems);
+    }
+
+    @Override
+    public double fitness(ISolution<T> individual) {
+        return simpleMultiObjectiveProblem.fitness(individual);
+    }
+
+    @Override
+    public double penalty(ISolution<T> individual) {
+        return simpleMultiObjectiveProblem.penalty(individual);
+    }
+
+    @Override
+    public double[] fitness(Collection<? extends ISolution<T>> population) {
+        if (fitnessValues == null || fitnessValues.length != population.size()) {
+            fitnessValues = new double[population.size()];
+        }
+
+        useFitness = true;
+        values = fitnessValues;
+        evaluate(population);
+
+        return fitnessValues;
+    }
+
+    @Override
+    public double[] penalty(Collection<? extends ISolution<T>> population) {
+        if (penaltyValues == null || penaltyValues.length != population.size()) {
+            penaltyValues = new double[population.size()];
+        }
+
+        useFitness = false;
+        values = penaltyValues;
+        evaluate(population);
+
+        return penaltyValues;
+    }
+
+    private void evaluate(Collection<? extends ISolution<T>> population) {
+        Map<ISolution<T>, Double> resultMap = new HashMap<>(population.size());
+
+        List<Collection<ISolution<T>>> sortedPopulation = notDominatedSorting(population);
+
+        double fmin = population.size() + epsilon;
+
+        for (Collection<? extends ISolution<T>> subPopulation : sortedPopulation) {
+            double nextFmin = Double.MAX_VALUE;
+            for (ISolution<T> individual : subPopulation) {
+                double f  = fmin - epsilon;
+                double nc = nicheDensity(individual, subPopulation);
+                f /= nc;
+                nextFmin = Math.min(nextFmin, f);
+                resultMap.put(individual, f);
+            }
+
+            fmin = nextFmin;
+        }
+
+        int offset = 0;
+        for (ISolution<T> individual : population) {
+            values[offset++] = resultMap.get(individual);
+        }
+    }
+
+    private boolean dominates(ISolution<T> a, ISolution<T> b) {
+        RealVector x = getResult(a);
+        RealVector y = getResult(b);
+
+        boolean dominatesForEachComponent = true;
+        for (int i = 0; i < x.getSize(); i++) {
+            if (useFitness) {
+                if (!(x.getValue(i) >= y.getValue(i))) {
+                    dominatesForEachComponent = false;
+                    break;
+                }
+            } else {
+                if (!(x.getValue(i) <= y.getValue(i))) {
+                    dominatesForEachComponent = false;
+                    break;
+                }
+            }
+        }
+
+        boolean dominatesForSingleComponent = false;
+        for (int i = 0; i < x.getSize(); i++) {
+            if (useFitness) {
+                if (y.getValue(i) >= x.getValue(i)) {
+                    dominatesForSingleComponent = false;
+                    break;
+                } else if (x.getValue(i) > y.getValue(i)) {
+                    dominatesForSingleComponent = true;
+                }
+            } else {
+                if (y.getValue(i) <= x.getValue(i)) {
+                    dominatesForSingleComponent = false;
+                    break;
+                } else if (x.getValue(i) < y.getValue(i)) {
+                    dominatesForSingleComponent = true;
+                }
+            }
+        }
+
+        return dominatesForEachComponent | dominatesForSingleComponent;
+    }
+
+    private Collection<ISolution<T>> findNotDominatedIndividuals(Collection<ISolution<T>> population) {
+        List<ISolution<T>> notDominated = new ArrayList<>();
+
+        for (ISolution<T> a : population) {
+            boolean hasDominator = false;
+            for (ISolution<T> b : population) {
+                if (dominates(b, a)) {
+                    hasDominator = true;
+                    break;
+                }
+            }
+
+            if (!hasDominator) {
+                notDominated.add(a);
+            }
+        }
+
+        return notDominated;
+    }
+
+    private List<Collection<ISolution<T>>> notDominatedSorting(Collection<? extends ISolution<T>> population) {
+        List<ISolution<T>>             populationList = new ArrayList<>(population);
+        List<Collection<ISolution<T>>> sorted         = new ArrayList<>();
+
+        while (!populationList.isEmpty()) {
+            Collection<ISolution<T>> notDominated = findNotDominatedIndividuals(populationList);
+            if (notDominated.isEmpty()) {
+                sorted.add(populationList);
+                break;
+            }
+            sorted.add(notDominated);
+            populationList.removeAll(notDominated);
+        }
+
+        return sorted;
+    }
+
+    private double getDistance(ISolution<T> first, ISolution<T> second) {
+        RealVector a = first.getRepresentative();
+        RealVector b = second.getRepresentative();
+
+        if (!useSolutionSpace) {
+            a = getResult(first);
+            b = getResult(second);
+        }
+
+        return a.getDistance(b);
+    }
+
+    private double nicheDensity(ISolution<T> individual, Collection<? extends ISolution<T>> population) {
+        double nc = 0;
+        for (ISolution<T> neighbor : population) {
+            double d = getDistance(individual, neighbor);
+            if (d < sigmaShare) {
+                nc += 1 - Math.pow(d / sigmaShare, alpha);
+            }
+        }
+        return nc;
+    }
+
+    private RealVector getResult(ISolution<T> solution) {
+        RealVector result = new RealVector(problems.length);
+        for (int i = 0; i < problems.length; i++) {
+            result.setValue(i, useFitness ? problems[i].fitness(solution) : problems[i].penalty(solution));
+        }
+        return result;
+    }
 }

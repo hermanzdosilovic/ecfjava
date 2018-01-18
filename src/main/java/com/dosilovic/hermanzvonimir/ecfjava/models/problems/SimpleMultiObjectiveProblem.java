@@ -31,10 +31,10 @@ public class SimpleMultiObjectiveProblem<T> extends SingleObjectiveProblem<T> {
     @Override
     public double fitness(ISolution<T> individual) {
         double fitness = 0;
-        int    i       = 0;
 
+        int offset = 0;
         for (IProblem<T> problem : problems) {
-            fitness += functions[i++].value(problem.fitness(individual));
+            fitness += functions[offset++].value(problem.fitness(individual));
         }
 
         return fitness;
@@ -43,10 +43,10 @@ public class SimpleMultiObjectiveProblem<T> extends SingleObjectiveProblem<T> {
     @Override
     public double penalty(ISolution<T> individual) {
         double penalty = 0;
-        int    i       = 0;
 
+        int offset = 0;
         for (IProblem<T> problem : problems) {
-            penalty += functions[i++].value(problem.penalty(individual));
+            penalty += functions[offset++].value(problem.penalty(individual));
         }
 
         return penalty;
