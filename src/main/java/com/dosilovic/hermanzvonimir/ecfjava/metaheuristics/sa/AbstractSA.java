@@ -48,6 +48,8 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
 
         solution.updatePenalty(problem);
 
+        boolean innerStop = false;
+
         for (double outerTemperature : outerCoolingSchedule) {
             solution = onOuterTemperatureStart(outerTemperature);
             notifyObservers();
@@ -86,9 +88,22 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
                     System.err.println("Reached desired penalty.\n");
                     break;
                 }
+
+                if (isStopped.get()) {
+                    System.err.println("Algorithm stopped.\n");
+                    innerStop = true;
+                    break;
+                }
             }
 
             if (Math.abs(bestSolution.getPenalty() - desiredPenalty) <= desiredPrecision) {
+                break;
+            }
+
+            if (isStopped.get()) {
+                if (!innerStop) {
+                    System.err.println("Algorithm stopped.\n");
+                }
                 break;
             }
         }

@@ -76,6 +76,11 @@ public abstract class AbstractGA<T> extends AbstractPopulationMetaheuristic<T> i
                 break;
             }
 
+            if (isStopped.get()) {
+                System.err.println("Algorithm stopped.\n");
+                break;
+            }
+
             population = createNextPopulation();
 
             if (generation == maxGenerations) {

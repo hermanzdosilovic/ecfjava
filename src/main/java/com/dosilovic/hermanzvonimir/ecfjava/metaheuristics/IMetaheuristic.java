@@ -7,6 +7,8 @@ public interface IMetaheuristic<T> {
 
     ISolution<T> run();
 
+    void stop();
+
     ISolution<T> getBestSolution();
 
     void setBestSolution(ISolution<T> bestSolution);

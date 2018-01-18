@@ -99,6 +99,11 @@ public abstract class AbstractOSGA<T> extends AbstractGA<T> {
                 break;
             }
 
+            if (isStopped.get()) {
+                System.err.println("Algorithm stopped.\n");
+                break;
+            }
+
             unsuccessfulPopulation = new ArrayList<>((int) (population.size() * (1 - successRatio)) + 1);
             successfulPopulation = createSuccessfulPopulation(unsuccessfulPopulation);
 

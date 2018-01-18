@@ -61,6 +61,11 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractPopulatio
                 break;
             }
 
+            if (isStopped.get()) {
+                System.err.println("Algorithm stopped.\n");
+                break;
+            }
+
             int k = 0;
             for (ISolution<T> individual : population) {
                 ISolution<T> trialSolution = createTrialSolution(individual);

@@ -91,6 +91,11 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractPopulati
                 break;
             }
 
+            if (isStopped.get()) {
+                System.err.println("Algorithm stopped.\n");
+                break;
+            }
+
             for (Particle<T> particle : particles) {
                 T          representative     = particle.getSolution().getRepresentative();
                 RealVector speed              = particle.getSpeed();

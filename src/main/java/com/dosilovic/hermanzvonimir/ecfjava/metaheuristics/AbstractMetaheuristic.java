@@ -6,10 +6,13 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractMetaheuristic<T> implements IMetaheuristic<T> {
 
     protected ISolution<T> bestSolution;
+
+    protected AtomicBoolean isStopped = new AtomicBoolean();
 
     private Set<IObserver<T>> observers;
 
@@ -17,6 +20,11 @@ public abstract class AbstractMetaheuristic<T> implements IMetaheuristic<T> {
 
     public AbstractMetaheuristic() {
         observers = new HashSet<>();
+    }
+
+    @Override
+    public void stop() {
+        isStopped.set(true);
     }
 
     @Override
