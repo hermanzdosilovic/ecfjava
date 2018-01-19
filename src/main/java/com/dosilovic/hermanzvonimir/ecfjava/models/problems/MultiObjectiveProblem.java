@@ -101,41 +101,31 @@ public class MultiObjectiveProblem<T extends RealVector> implements IProblem<T> 
         RealVector x = getResult(a);
         RealVector y = getResult(b);
 
-        boolean dominatesForEachComponent = true;
         for (int i = 0; i < x.getSize(); i++) {
             if (useFitness) {
-                if (!(x.getValue(i) >= y.getValue(i))) {
-                    dominatesForEachComponent = false;
-                    break;
+                if (y.getValue(i) > x.getValue(i)) {
+                    return false;
                 }
             } else {
-                if (!(x.getValue(i) <= y.getValue(i))) {
-                    dominatesForEachComponent = false;
-                    break;
+                if (y.getValue(i) < x.getValue(i)) {
+                    return false;
                 }
             }
         }
 
-        boolean dominatesForSingleComponent = false;
         for (int i = 0; i < x.getSize(); i++) {
             if (useFitness) {
-                if (y.getValue(i) >= x.getValue(i)) {
-                    dominatesForSingleComponent = false;
-                    break;
-                } else if (x.getValue(i) > y.getValue(i)) {
-                    dominatesForSingleComponent = true;
+                if (x.getValue(i) > y.getValue(i)) {
+                    return true;
                 }
             } else {
-                if (y.getValue(i) <= x.getValue(i)) {
-                    dominatesForSingleComponent = false;
-                    break;
-                } else if (x.getValue(i) < y.getValue(i)) {
-                    dominatesForSingleComponent = true;
+                if (x.getValue(i) < y.getValue(i)) {
+                    return true;
                 }
             }
         }
 
-        return dominatesForEachComponent | dominatesForSingleComponent;
+        return false;
     }
 
     private Collection<ISolution<T>> findNotDominatedIndividuals(Collection<ISolution<T>> population) {
