@@ -40,6 +40,8 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractPopulatio
         long startTime = System.nanoTime();
 
         setPopulation(initialPopulation);
+        isStopped.set(false);
+        bestSolution = null;
 
         List<ISolution<T>> nextPopulation = new ArrayList<>(initialPopulation);
         List<ISolution<T>> tmpPopulation;

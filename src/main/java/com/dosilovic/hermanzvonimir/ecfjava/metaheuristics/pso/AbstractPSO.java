@@ -75,6 +75,8 @@ public abstract class AbstractPSO<T extends RealVector> extends AbstractPopulati
         long startTime = System.nanoTime();
 
         setPopulation(initialPopulation);
+        isStopped.set(false);
+        bestSolution = null;
 
         for (iteration = 1; iteration <= maxIterations; iteration++) {
             Solutions.updateFitness(particles, problem);

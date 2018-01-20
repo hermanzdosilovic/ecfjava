@@ -5,6 +5,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSc
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
 
 import java.time.Duration;
 import java.util.Date;
@@ -39,20 +40,16 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
         long startTime = System.nanoTime();
 
         setSolution(initialSolution);
-
-        if (initialSolution == null) {
-            throw new IllegalStateException("No initial solution");
-        }
-
-        bestSolution = solution;
-
-        solution.updatePenalty(problem);
+        isStopped.set(false);
+        bestSolution = null;
 
         boolean innerStop = false;
 
+        solution.updatePenalty(problem);
+
         for (double outerTemperature : outerCoolingSchedule) {
             solution = onOuterTemperatureStart(outerTemperature);
-            notifyObservers();
+            setBestSolution(Solutions.betterByPenalty(bestSolution, solution));
 
             System.err.printf(
                 "Temperature %f (%s)\n" +
@@ -80,9 +77,7 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
                     innerTemperature
                 );
 
-                if (solution.getPenalty() <= bestSolution.getPenalty()) {
-                    bestSolution = solution;
-                }
+                setBestSolution(Solutions.betterByPenalty(bestSolution, solution));
 
                 if (Math.abs(bestSolution.getPenalty() - desiredPenalty) <= desiredPrecision) {
                     System.err.println("Reached desired penalty.\n");

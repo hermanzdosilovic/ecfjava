@@ -62,6 +62,8 @@ public abstract class AbstractOSGA<T> extends AbstractGA<T> {
         long startTime = System.nanoTime();
 
         setPopulation(initialPopulation);
+        isStopped.set(false);
+        bestSolution = null;
 
         if (!evaluateEveryGeneration) {
             Solutions.updateFitness(population, problem);

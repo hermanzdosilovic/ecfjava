@@ -54,6 +54,8 @@ public abstract class AbstractGA<T> extends AbstractPopulationMetaheuristic<T> i
         long startTime = System.nanoTime();
 
         setPopulation(initialPopulation);
+        isStopped.set(false);
+        bestSolution = null;
 
         if (!evaluateEveryGeneration) {
             Solutions.updateFitness(population, problem);
