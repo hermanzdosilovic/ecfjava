@@ -77,7 +77,7 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
                     innerTemperature
                 );
 
-                setBestSolution(Solutions.betterByPenalty(bestSolution, solution));
+                bestSolution = Solutions.betterByPenalty(bestSolution, solution);
 
                 if (Math.abs(bestSolution.getPenalty() - desiredPenalty) <= desiredPrecision) {
                     System.err.println("Reached desired penalty.\n");
