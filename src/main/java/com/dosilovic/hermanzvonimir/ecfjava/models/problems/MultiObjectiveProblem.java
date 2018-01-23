@@ -46,34 +46,18 @@ public class MultiObjectiveProblem<T extends RealVector> implements IProblem<T> 
     }
 
     @Override
-    public double[] fitness(Collection<? extends ISolution<T>> population) {
-        if (fitnessValues == null || fitnessValues.length != population.size()) {
-            fitnessValues = new double[population.size()];
-        }
-
+    public void updateFitness(Collection<? extends ISolution<T>> population) {
         useFitness = true;
-        values = fitnessValues;
         evaluate(population);
-
-        return fitnessValues;
     }
 
     @Override
-    public double[] penalty(Collection<? extends ISolution<T>> population) {
-        if (penaltyValues == null || penaltyValues.length != population.size()) {
-            penaltyValues = new double[population.size()];
-        }
-
+    public void updatePenalty(Collection<? extends ISolution<T>> population) {
         useFitness = false;
-        values = penaltyValues;
         evaluate(population);
-
-        return penaltyValues;
     }
 
     private void evaluate(Collection<? extends ISolution<T>> population) {
-        Map<ISolution<T>, Double> resultMap = new HashMap<>(population.size());
-
         List<Collection<ISolution<T>>> sortedPopulation = notDominatedSorting(population);
 
         double fmin = population.size() + epsilon;
@@ -84,16 +68,15 @@ public class MultiObjectiveProblem<T extends RealVector> implements IProblem<T> 
                 double f  = fmin - epsilon;
                 double nc = nicheDensity(individual, subPopulation);
                 f /= nc;
+                if (useFitness) {
+                    individual.setFitness(f);
+                } else {
+                    individual.setPenalty(f);
+                }
                 nextFmin = Math.min(nextFmin, f);
-                resultMap.put(individual, f);
             }
 
             fmin = nextFmin;
-        }
-
-        int offset = 0;
-        for (ISolution<T> individual : population) {
-            values[offset++] = resultMap.get(individual);
         }
     }
 

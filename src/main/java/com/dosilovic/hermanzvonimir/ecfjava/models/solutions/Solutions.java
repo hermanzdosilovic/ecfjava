@@ -7,19 +7,11 @@ import java.util.Collection;
 public final class Solutions {
 
     public static <T> void updateFitness(Collection<? extends ISolution<T>> population, IProblem<T> problem) {
-        double[] fitnessValues = problem.fitness(population);
-        int      i             = 0;
-        for (ISolution<T> individual : population) {
-            individual.setFitness(fitnessValues[i++]);
-        }
+        problem.updateFitness(population);
     }
 
     public static <T> void updatePenalty(Collection<? extends ISolution<T>> population, IProblem<T> problem) {
-        double[] penaltyValues = problem.penalty(population);
-        int      i             = 0;
-        for (ISolution<T> individual : population) {
-            individual.setPenalty(penaltyValues[i++]);
-        }
+        problem.updatePenalty(population);
     }
 
     public static <T> ISolution<T> betterByFitness(ISolution<T> first, ISolution<T> second) {

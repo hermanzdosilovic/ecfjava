@@ -10,7 +10,7 @@ public interface IProblem<T> {
 
     double penalty(ISolution<T> individual);
 
-    double[] fitness(Collection<? extends ISolution<T>> population);
+    void updateFitness(Collection<? extends ISolution<T>> population);
 
-    double[] penalty(Collection<? extends ISolution<T>> population);
+    void updatePenalty(Collection<? extends ISolution<T>> population);
 }
