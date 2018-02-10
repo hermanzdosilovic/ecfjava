@@ -2,6 +2,8 @@ package com.dosilovic.hermanzvonimir.ecfjava.models.selections;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +36,8 @@ public class TournamentSelection<T> implements ISelection<T> {
 
     @Override
     public ISolution<T> select(Collection<ISolution<T>> population) {
+        IRandom random = Random.getRandom();
+
         List<ISolution<T>> competitors = new ArrayList<>(population.size());
         if (isUniqueTournament) {
             competitors.addAll(new HashSet<>(population));
@@ -44,7 +48,7 @@ public class TournamentSelection<T> implements ISelection<T> {
         ISolution<T> best = null;
         ISolution<T> competitor;
         for (int i = 0; i < size; i++) {
-            competitor = competitors.get(RAND.nextInt(competitors.size()));
+            competitor = competitors.get(random.nextInt(competitors.size()));
             if (best == null) {
                 best = competitor;
             } else if (useFitness) {

@@ -2,6 +2,8 @@ package com.dosilovic.hermanzvonimir.ecfjava.models.crossovers;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.IVector;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +23,8 @@ public class UniformCrossover<T extends IVector> implements ICrossover<T> {
     @SuppressWarnings("unchecked")
     @Override
     public Collection<ISolution<T>> cross(ISolution<T> mom, ISolution<T> dad) {
+        IRandom random = Random.getRandom();
+
         T momRepresentative = mom.getRepresentative();
         T dadRepresentative = dad.getRepresentative();
 
@@ -33,7 +37,7 @@ public class UniformCrossover<T extends IVector> implements ICrossover<T> {
         bob.setRepresentative(bobRepresentative);
 
         for (int i = 0; i < momRepresentative.getSize(); i++) {
-            if (RAND.nextDouble() < crossoverProbability) {
+            if (random.nextDouble() < crossoverProbability) {
                 aliceRepresentative.setValue(i, dadRepresentative.getValue(i));
                 bobRepresentative.setValue(i, momRepresentative.getValue(i));
             }

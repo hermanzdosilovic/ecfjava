@@ -52,13 +52,20 @@ public class SimpleGA<T> extends AbstractGA<T> {
 
             Collection<ISolution<T>> children = crossover.cross(mom, dad);
 
-            Collection<ISolution<T>> mutatedChildren = new ArrayList<>(children.size());
-            for (ISolution<T> child : children) {
-                mutatedChildren.add(mutation.mutate(child));
-            }
+            if (!evaluateEveryGeneration) {
+                List<ISolution<T>> mutatedChildren = new ArrayList<>(children.size());
+                for (ISolution<T> child : children) {
+                    mutatedChildren.add(mutation.mutate(child));
+                }
 
-            Solutions.updateFitness(mutatedChildren, problem);
-            nextPopulation.add(Solutions.findBestByFitness(mutatedChildren));
+                Solutions.updateFitness(mutatedChildren, problem);
+                nextPopulation.add(Solutions.findBestByFitness(mutatedChildren));
+            } else {
+                for (ISolution<T> child : children) {
+                    nextPopulation.add(mutation.mutate(child));
+                    break;
+                }
+            }
         }
 
         return nextPopulation;

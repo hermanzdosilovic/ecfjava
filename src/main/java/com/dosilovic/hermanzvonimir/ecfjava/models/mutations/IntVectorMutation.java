@@ -2,6 +2,8 @@ package com.dosilovic.hermanzvonimir.ecfjava.models.mutations;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.IntVector;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
 public class IntVectorMutation<T extends IntVector> implements IMutation<T> {
 
@@ -32,25 +34,27 @@ public class IntVectorMutation<T extends IntVector> implements IMutation<T> {
     @SuppressWarnings("unchecked")
     @Override
     public ISolution<T> mutate(ISolution<T> child) {
+        IRandom random = Random.getRandom();
+
         T childRepresentative  = child.getRepresentative();
         T mutantRepresentative = (T) childRepresentative.copy();
 
         boolean mutationHappened = false;
         for (int i = 0; i < mutantRepresentative.getSize(); i++) {
-            if (RAND.nextDouble() < mutationProbability) {
+            if (random.nextDouble() < mutationProbability) {
                 mutationHappened = true;
                 mutantRepresentative.setValue(
                     i,
-                    mutantRepresentative.getValue(i) + minValue + RAND.nextInt(maxValue - minValue)
+                    mutantRepresentative.getValue(i) + minValue + random.nextInt(maxValue - minValue)
                 );
             }
         }
 
         if (!mutationHappened && forceMutation) {
-            int i = RAND.nextInt(mutantRepresentative.getSize());
+            int i = random.nextInt(mutantRepresentative.getSize());
             mutantRepresentative.setValue(
                 i,
-                mutantRepresentative.getValue(i) + minValue + RAND.nextInt(maxValue - minValue)
+                mutantRepresentative.getValue(i) + minValue + random.nextInt(maxValue - minValue)
             );
         }
 
