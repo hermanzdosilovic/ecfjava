@@ -4,15 +4,15 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
 import java.util.Collection;
 
-public interface IPopulationMetaheuristic<T> extends IMetaheuristic<T> {
+public interface IPopulationMetaheuristic<T extends ISolution> extends IMetaheuristic<T> {
 
-    Collection<ISolution<T>> getInitialPopulation();
+    Collection<T> getInitialPopulation();
 
-    void setInitialPopulation(Collection<ISolution<T>> initialPopulation);
+    void setInitialPopulation(Collection<T> initialPopulation);
 
-    Collection<ISolution<T>> getPopulation();
+    Collection<T> getPopulation();
 
-    void setPopulation(Collection<ISolution<T>> population);
+    void setPopulation(Collection<T> population);
 
-    ISolution<T> run(Collection<ISolution<T>> initialPopulation);
+    T run(Collection<T> initialPopulation);
 }

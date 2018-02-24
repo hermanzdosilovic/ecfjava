@@ -1,62 +1,58 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector;
 
-import java.util.Random;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.AbstractSolution;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
-public class BitVector implements IVector<Boolean> {
+import java.util.Arrays;
 
-    private boolean[] bits;
+public class BitVector extends AbstractSolution implements IVector<Boolean> {
+
+    private boolean[] data;
     private int       cardinality;
 
-    private static final Random RAND = new Random();
-
     public BitVector(int size) {
-        bits = new boolean[size];
+        data = new boolean[size];
     }
 
-    public BitVector(boolean... bits) {
-        this.bits = bits.clone();
+    public BitVector(boolean[] data) {
+        this.data = data.clone();
         countNumberOfSetBits();
     }
 
-    public BitVector(BitVector bitVector) {
-        this(bitVector.bits);
-    }
-
-    public BitVector(int size, boolean initialValue) {
-        this(size);
-        for (int i = 0; i < size; i++) {
-            setValue(i, initialValue);
-        }
-    }
-
-    public BitVector(int size, Boolean setBitsAtRandom) {
-        this(size);
-        if (setBitsAtRandom) {
-            for (int i = 0; i < size; i++) {
-                setValue(i, RAND.nextBoolean());
-            }
-        }
+    public BitVector(BitVector vector) {
+        this(vector.data);
+        setFitness(vector.getFitness());
+        setPenalty(vector.getPenalty());
     }
 
     @Override
     public Boolean getValue(int index) {
-        return bits[index];
+        return data[index];
     }
 
     @Override
     public void setValue(int index, Boolean value) {
-        if (bits[index] && !value) {
+        if (data[index] && !value) {
             cardinality--;
-        } else if (!bits[index] && value) {
+        } else if (!data[index] && value) {
             cardinality++;
         }
 
-        bits[index] = value;
+        data[index] = value;
     }
 
     @Override
     public int getSize() {
-        return bits.length;
+        return data.length;
+    }
+
+    @Override
+    public void randomizeValues() {
+        IRandom random = Random.getRandom();
+        for (int i = 0; i < data.length; i++) {
+            data[i] = random.nextBoolean();
+        }
     }
 
     @Override
@@ -64,20 +60,30 @@ public class BitVector implements IVector<Boolean> {
         return new BitVector(this);
     }
 
-    public void flip(int index) {
-        setValue(index, !bits[index]);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BitVector bitVector = (BitVector) o;
+        return Arrays.equals(data, bitVector.data);
     }
 
-    public int getCardinality() {
-        return cardinality;
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(data);
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder("{");
-        for (int i = 0; i < bits.length; i++) {
-            stringBuilder.append(bits[i]);
-            if (i + 1 != bits.length) {
+        int i = 0;
+        for (boolean bool : data) {
+            stringBuilder.append(bool ? 1 : 0);
+            if (++i < data.length) {
                 stringBuilder.append("; ");
             }
         }
@@ -85,8 +91,16 @@ public class BitVector implements IVector<Boolean> {
         return stringBuilder.toString();
     }
 
+    public void flip(int index) {
+        setValue(index, !data[index]);
+    }
+
+    public int getCardinality() {
+        return cardinality;
+    }
+
     private void countNumberOfSetBits() {
-        for (boolean bit : bits) {
+        for (boolean bit : data) {
             if (bit) {
                 cardinality++;
             }

@@ -2,18 +2,18 @@ package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
-public abstract class AbstractIndividualMetaheuristic<T> extends AbstractMetaheuristic<T> implements IIndividualMetaheuristic<T> {
+public abstract class AbstractIndividualMetaheuristic<T extends ISolution> extends AbstractMetaheuristic<T> implements IIndividualMetaheuristic<T> {
 
-    protected ISolution<T> initialSolution;
-    protected ISolution<T> solution;
+    protected T initialSolution;
+    protected T solution;
 
     @Override
-    public ISolution<T> getInitialSolution() {
+    public T getInitialSolution() {
         return initialSolution;
     }
 
     @Override
-    public void setInitialSolution(ISolution<T> initialSolution) {
+    public void setInitialSolution(T initialSolution) {
         if (initialSolution == null) {
             throw new IllegalArgumentException("Initial solution cannot be null");
         }
@@ -21,12 +21,12 @@ public abstract class AbstractIndividualMetaheuristic<T> extends AbstractMetaheu
     }
 
     @Override
-    public ISolution<T> getSolution() {
+    public T getSolution() {
         return solution;
     }
 
     @Override
-    public void setSolution(ISolution<T> solution) {
+    public void setSolution(T solution) {
         if (solution == null) {
             throw new IllegalArgumentException("Solution cannot be null");
         }
@@ -34,7 +34,7 @@ public abstract class AbstractIndividualMetaheuristic<T> extends AbstractMetaheu
     }
 
     @Override
-    public ISolution<T> run(ISolution<T> initialSolution) {
+    public T run(T initialSolution) {
         setInitialSolution(initialSolution);
         return run();
     }

@@ -1,12 +1,12 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies;
 
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particle;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
 import java.util.Collection;
 
-public interface ITopology<T> {
+public interface ITopology<T extends ISolution> {
 
-    public Collection<Particle<T>> getNeighbours(Particle<T> particle);
+    Collection<T> getNeighbours(T individual);
 
-    public void updateTopology(Collection<Particle<T>> particles);
+    void updateTopology(Collection<T> population);
 }

@@ -4,7 +4,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.AbstractPopulationMet
 import com.dosilovic.hermanzvonimir.ecfjava.models.crossovers.ICrossover;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.util.Solutions;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 import java.time.Duration;
@@ -36,19 +36,19 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractPopulatio
     }
 
     @Override
-    public ISolution<T> run() {
+    public T run() {
         long startTime = System.nanoTime();
 
         setPopulation(initialPopulation);
         isStopped.set(false);
         bestSolution = null;
 
-        List<ISolution<T>> nextPopulation = new ArrayList<>(initialPopulation);
-        List<ISolution<T>> tmpPopulation;
+        List<T> nextPopulation = new ArrayList<>(initialPopulation);
+        List<T> tmpPopulation;
 
         int generation;
         for (generation = 1; generation <= maxGenerations; generation++) {
-            Solutions.updateFitness(population, problem);
+            problem.updateFitness(population);
             setBestSolution(Solutions.findBestByFitness(population));
 
             System.err.printf(
@@ -69,8 +69,8 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractPopulatio
             }
 
             int k = 0;
-            for (ISolution<T> individual : population) {
-                ISolution<T> trialSolution = createTrialSolution(individual);
+            for (T individual : population) {
+                T trialSolution = createTrialSolution(individual);
                 if (trialSolution.getFitness() >= individual.getFitness()) {
                     nextPopulation.set(k, trialSolution);
                 } else {
@@ -89,13 +89,13 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractPopulatio
             }
         }
 
-        Solutions.updateFitness(population, problem);
+        problem.updateFitness(population);
         setBestSolution(Solutions.findBestByFitness(population));
 
         long     stopTime = System.nanoTime();
         Duration duration = Duration.ofNanos(stopTime - startTime);
 
-        System.err.printf("Solution: %s\nFitness: %f\n", bestSolution.getRepresentative(), bestSolution.getFitness());
+        System.err.printf("Solution: %s\nFitness: %f\n", bestSolution, bestSolution.getFitness());
         System.err.printf("Generation: #%d\n", generation);
         System.err.printf(
             "Time: %02d:%02d:%02d.%03d\n\n",
@@ -109,5 +109,5 @@ public abstract class AbstractDE<T extends RealVector> extends AbstractPopulatio
         return bestSolution;
     }
 
-    protected abstract ISolution<T> createTrialSolution(ISolution<T> solution);
+    protected abstract T createTrialSolution(T solution);
 }

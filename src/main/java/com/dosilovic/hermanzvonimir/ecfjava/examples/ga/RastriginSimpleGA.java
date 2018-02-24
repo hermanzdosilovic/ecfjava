@@ -10,9 +10,10 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.problems.FunctionMinimization
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.TournamentSelection;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.ISolutionFactory;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.IFactory;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.RandomVectorFactory;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.RealVectorFactory;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.SimpleSolutionFactory;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.BoundedRealVector;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 import com.dosilovic.hermanzvonimir.ecfjava.numeric.RastriginFunction;
 
@@ -22,17 +23,16 @@ public final class RastriginSimpleGA {
         final int     NUMBER_OF_COMPONENTS      = 30;
         final double  MIN_COMPONENT_VALUE       = -10;
         final double  MAX_COMPONENT_VALUE       = 10;
-        final boolean IS_BOUNDED                = true;
-        final int     POPULATION_SIZE           = 20;
+        final int     POPULATION_SIZE           = 5;
         final boolean USE_ELITISM               = true;
-        final int     MAX_GENERATIONS           = 100_000;
+        final int     MAX_GENERATIONS           = 1000_000;
         final boolean EVALUATE_EVERY_GENERATION = false;
         final double  DESIRED_FITNESS           = 0;
-        final double  DESIRED_PRECISION         = 1e-3;
-        final int     TOURNAMENT_SIZE           = 10;
+        final double  DESIRED_PRECISION         = 1e-4;
+        final int     TOURNAMENT_SIZE           = 3;
         final boolean IS_UNIQUE_TOURNAMENT      = true;
         final double  CROSSOVER_ALPHA           = 0.2;
-        final double  MUTATION_PROBABILITY      = 0.1;
+        final double  MUTATION_PROBABILITY      = 0.01;
         final boolean FORCE_MUTATION            = true;
         final double  MUTATION_SIGMA            = 0.3;
 
@@ -55,9 +55,9 @@ public final class RastriginSimpleGA {
             mutation
         );
 
-        ISolutionFactory<RealVector> populationFactory = new SimpleSolutionFactory<>(
+        IFactory<RealVector> populationFactory = new RandomVectorFactory<>(
             new RealVectorFactory(
-                new RealVector(NUMBER_OF_COMPONENTS, MIN_COMPONENT_VALUE, MAX_COMPONENT_VALUE, IS_BOUNDED)
+                new BoundedRealVector(NUMBER_OF_COMPONENTS, MIN_COMPONENT_VALUE, MAX_COMPONENT_VALUE)
             )
         );
 

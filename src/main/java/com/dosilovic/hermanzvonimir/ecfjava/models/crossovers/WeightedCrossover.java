@@ -1,10 +1,11 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.crossovers;
 
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.IVector;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 public class WeightedCrossover<T extends IVector> implements ICrossover<T> {
 
@@ -20,31 +21,25 @@ public class WeightedCrossover<T extends IVector> implements ICrossover<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Collection<ISolution<T>> cross(ISolution<T> mom, ISolution<T> dad) {
-        T momRepresentative = mom.getRepresentative();
-        T dadRepresentative = dad.getRepresentative();
+    public List<T> cross(T mom, T dad) {
+        IRandom random = Random.getRandom();
 
-        ISolution<T> alice               = mom.copy();
-        ISolution<T> bob                 = dad.copy();
-        T            aliceRepresentative = (T) momRepresentative.copy();
-        T            bobRepresentative   = (T) dadRepresentative.copy();
-
-        alice.setRepresentative(aliceRepresentative);
-        bob.setRepresentative(bobRepresentative);
+        T alice = (T) mom.copy();
+        T bob   = (T) dad.copy();
 
         double momFitness = Math.abs(useFitness ? mom.getFitness() : mom.getPenalty());
         double dadFitness = Math.abs(useFitness ? dad.getFitness() : dad.getPenalty());
-        double fitnessSum = momFitness + dadFitness;
+        double momWeight  = momFitness / (momFitness + dadFitness);
 
-        for (int i = 0; i < momRepresentative.getSize(); i++) {
-            if (RAND.nextDouble() < momFitness / fitnessSum) {
-                bobRepresentative.setValue(i, momRepresentative.getValue(i));
+        for (int i = 0; i < alice.getSize(); i++) {
+            if (random.nextDouble() < momWeight) {
+                bob.setValue(i, mom.getValue(i));
             } else {
-                aliceRepresentative.setValue(i, dadRepresentative.getValue(i));
+                alice.setValue(i, dad.getValue(i));
             }
         }
 
-        Collection<ISolution<T>> children = new ArrayList<>();
+        List<T> children = new ArrayList<>();
         children.add(alice);
         children.add(bob);
 

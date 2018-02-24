@@ -1,28 +1,36 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.solutions;
 
-import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
+public abstract class AbstractSolution implements ISolution {
 
-public abstract class AbstractSolution<T> implements ISolution<T> {
+    private double fitness;
+    private double penalty;
 
-    @Override
-    public double updateFitness(IProblem<T> problem) {
-        setFitness(problem.fitness(this));
-        return getFitness();
+    public AbstractSolution(double fitness, double penalty) {
+        this.fitness = fitness;
+        this.penalty = penalty;
+    }
+
+    public AbstractSolution() {
+        this(-Double.MAX_VALUE, Double.MAX_VALUE);
     }
 
     @Override
-    public double updatePenalty(IProblem<T> problem) {
-        setPenalty(problem.penalty(this));
-        return getPenalty();
+    public double getFitness() {
+        return fitness;
     }
 
     @Override
-    public int compareTo(ISolution<T> o) {
-        if (this.getFitness() == o.getFitness()) {
-            return 0;
-        } else if (Solutions.betterByFitness(this, o) == this) {
-            return 1;
-        }
-        return -1;
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
+    @Override
+    public double getPenalty() {
+        return penalty;
+    }
+
+    @Override
+    public void setPenalty(double penalty) {
+        this.penalty = penalty;
     }
 }

@@ -2,48 +2,53 @@ package com.dosilovic.hermanzvonimir.ecfjava.examples.pso;
 
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.ConstrictedPSO;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.IParticleSwarmOptimization;
+import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.StochasticIWPSO;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.FullyConnectedTopology;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopology;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ConstantCoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.FunctionMinimizationProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.ISolutionFactory;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.IFactory;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.ParticleFactory;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.RealVectorFactory;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.SimpleSolutionFactory;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.RandomParticleFactory;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particle;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.BoundedRealVector;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
-import com.dosilovic.hermanzvonimir.ecfjava.numeric.GriewankFunction;
+import com.dosilovic.hermanzvonimir.ecfjava.numeric.SalomonFunction;
+import com.dosilovic.hermanzvonimir.ecfjava.numeric.adapters.ParticleFunctionAdapter;
 
-public final class GriewankConstrictedPSO {
+public final class SalomonConstrictedPSO {
 
     public static void main(String[] args) {
-        final int     NUMBER_OF_COMPONENTS = 10;
+        final int     NUMBER_OF_COMPONENTS = 30;
         final double  MIN_COMPONENT_VALUE  = -5.12;
         final double  MAX_COMPONENT_VALUE  = 5.12;
-        final boolean IS_BOUNDED           = true;
         final int     NUMBER_OF_PARTICLES  = 60;
-        final int     MAX_ITERATIONS       = 1000_000;
+        final int     MAX_ITERATIONS       = 10_000;
         final double  DESIRED_FITNESS      = 0;
-        final double  DESIRED_PRECISION    = 1e-3;
-        final boolean IS_FULLY_INFORMED    = true;
+        final double  DESIRED_PRECISION    = 1e-4;
+        final boolean IS_FULLY_INFORMED    = false;
         final double  INDIVIDUAL_FACTOR    = 2.05;
         final double  SOCIAL_FACTOR        = 2.05;
         final double  CONSTRICTION_FACTOR  = 0.729;
         final double  MIN_COMPONENT_SPEED  = -5.12;
         final double  MAX_COMPONENT_SPEED  = 5.12;
 
-        IProblem<RealVector> problem        = new FunctionMinimizationProblem<>(new GriewankFunction<>());
-        RealVector           minSpeedVector = new RealVector(NUMBER_OF_COMPONENTS, MIN_COMPONENT_SPEED);
-        RealVector           maxSpeedVector = new RealVector(NUMBER_OF_COMPONENTS, MAX_COMPONENT_SPEED);
+        IProblem<Particle> problem = new FunctionMinimizationProblem<>(
+            new ParticleFunctionAdapter<>(new SalomonFunction<>())
+        );
+
+        RealVector minSpeedVector = new RealVector(NUMBER_OF_COMPONENTS, MIN_COMPONENT_SPEED);
+        RealVector maxSpeedVector = new RealVector(NUMBER_OF_COMPONENTS, MAX_COMPONENT_SPEED);
 
         ICoolingSchedule constrictionFactorSchedule = new ConstantCoolingSchedule(
             MAX_ITERATIONS, CONSTRICTION_FACTOR
         );
 
-        ITopology<RealVector> topology = new FullyConnectedTopology<>();
+        ITopology<Particle> topology = new FullyConnectedTopology<>();
 
-        IParticleSwarmOptimization<RealVector> particleSwarmOptimization = new ConstrictedPSO<>(
+        IParticleSwarmOptimization<Particle> particleSwarmOptimization = new ConstrictedPSO<>(
             MAX_ITERATIONS,
             DESIRED_FITNESS,
             DESIRED_PRECISION,
@@ -57,14 +62,12 @@ public final class GriewankConstrictedPSO {
             topology
         );
 
-        ISolutionFactory<RealVector> particleFactory = new ParticleFactory<>(
-            new SimpleSolutionFactory<>(
-                new RealVectorFactory(
-                    new RealVector(NUMBER_OF_COMPONENTS, MIN_COMPONENT_VALUE, MAX_COMPONENT_VALUE, IS_BOUNDED)
+        IFactory<Particle> particleFactory = new RandomParticleFactory(
+            new ParticleFactory(
+                new Particle(
+                    new BoundedRealVector(NUMBER_OF_COMPONENTS, MIN_COMPONENT_VALUE, MAX_COMPONENT_VALUE),
+                    new BoundedRealVector(NUMBER_OF_COMPONENTS, MIN_COMPONENT_SPEED, MAX_COMPONENT_SPEED)
                 )
-            ),
-            new RealVectorFactory(
-                new RealVector(NUMBER_OF_COMPONENTS, MIN_COMPONENT_SPEED, MAX_COMPONENT_SPEED)
             )
         );
 

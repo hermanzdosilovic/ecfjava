@@ -2,9 +2,10 @@ package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso;
 
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopology;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particle;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
-public abstract class AbstractBasicPSO<T extends RealVector> extends AbstractPSO<T> {
+public abstract class AbstractBasicPSO<T extends Particle> extends AbstractPSO<T> {
 
     private double     individualFactor;
     private double     socialFactor;

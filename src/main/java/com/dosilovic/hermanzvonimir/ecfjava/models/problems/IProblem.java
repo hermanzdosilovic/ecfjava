@@ -4,13 +4,17 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
 import java.util.Collection;
 
-public interface IProblem<T> {
+public interface IProblem<T extends ISolution> {
 
-    double fitness(ISolution<T> individual);
+    double fitness(T individual);
 
-    double penalty(ISolution<T> individual);
+    double penalty(T individual);
 
-    void updateFitness(Collection<? extends ISolution<T>> population);
+    void updateFitness(T population);
 
-    void updatePenalty(Collection<? extends ISolution<T>> population);
+    void updatePenalty(T population);
+
+    void updateFitness(Collection<T> population);
+
+    void updatePenalty(Collection<T> population);
 }

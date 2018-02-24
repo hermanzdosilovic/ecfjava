@@ -1,6 +1,8 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector;
 
-public interface IVector<T> {
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+
+public interface IVector<T> extends ISolution {
 
     T getValue(int index);
 
@@ -8,5 +10,5 @@ public interface IVector<T> {
 
     int getSize();
 
-    IVector<T> copy();
+    void randomizeValues();
 }

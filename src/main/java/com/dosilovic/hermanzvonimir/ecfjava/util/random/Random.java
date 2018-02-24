@@ -1,6 +1,7 @@
 package com.dosilovic.hermanzvonimir.ecfjava.util.random;
 
 import com.dosilovic.hermanzvonimir.ecfjava.util.random.providers.IRandomProvider;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.providers.ThreadLocalRandomProvider;
 
 import java.util.Properties;
 
@@ -16,7 +17,7 @@ public class Random {
             Class<?> clazz = classLoader.loadClass(properties.getProperty("random.provider"));
             provider = (IRandomProvider) clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
-            e.printStackTrace();
+            provider = new ThreadLocalRandomProvider();
         }
     }
 

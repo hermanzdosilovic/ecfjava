@@ -4,9 +4,13 @@ public interface IRandom {
 
     double nextDouble();
 
+    double nextDouble(double bound);
+
     double nextDouble(double min, double max);
 
     float nextFloat();
+
+    float nextFloat(float bound);
 
     float nextFloat(float min, float max);
 

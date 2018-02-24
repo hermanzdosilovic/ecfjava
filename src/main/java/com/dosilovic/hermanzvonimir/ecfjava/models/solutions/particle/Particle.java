@@ -1,44 +1,35 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle;
 
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.AbstractSolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Particle<T> extends AbstractSolution<T> {
+public class Particle implements ISolution {
 
-    private ISolution<T> solution;
-    private ISolution<T> bestSolution;
-    private RealVector   speed;
+    private RealVector solution;
+    private RealVector bestSolution;
+    private RealVector speed;
 
     private int id;
 
     private static final AtomicInteger particlesCounter = new AtomicInteger(0);
 
-    public Particle(ISolution<T> initialSolution, RealVector initialSpeed) {
-        this.solution = initialSolution;
-        this.speed = initialSpeed;
+    public Particle(RealVector solution, RealVector speed) {
+        this.solution = solution;
+        this.bestSolution = null;
+        this.speed = speed;
         this.id = particlesCounter.getAndIncrement();
     }
 
-    public Particle(Particle<T> particle) {
+    public Particle(Particle particle) {
         this.solution = particle.solution.copy();
-        this.bestSolution = particle.bestSolution.copy();
+        if (particle.bestSolution != null) {
+            this.bestSolution = particle.bestSolution.copy();
+        }
         this.speed = particle.speed.copy();
         this.id = particlesCounter.getAndIncrement();
-    }
-
-    @Override
-    public T getRepresentative() {
-        return solution.getRepresentative();
-    }
-
-    @Override
-    public void setRepresentative(T representative) {
-        solution.setRepresentative(representative);
     }
 
     @Override
@@ -61,46 +52,9 @@ public class Particle<T> extends AbstractSolution<T> {
         solution.setPenalty(penalty);
     }
 
-    public ISolution<T> getSolution() {
-        return solution;
-    }
-
-    public void setSolution(ISolution<T> currentSolution) {
-        this.solution = currentSolution;
-    }
-
-    public ISolution<T> getBestSolution() {
-        return bestSolution;
-    }
-
-    public void setBestSolution(ISolution<T> bestSolution) {
-        this.bestSolution = bestSolution;
-    }
-
-    public RealVector getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(RealVector speed) {
-        this.speed = speed;
-    }
-
-    public void updateBestSolutionByFitness() {
-        setBestSolution(Solutions.betterByFitness(bestSolution, solution));
-    }
-
-    public void updateBestSolutionByPenalty() {
-        setBestSolution(Solutions.betterByPenalty(bestSolution, solution));
-    }
-
     @Override
     public Particle copy() {
         return new Particle(this);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 
     @Override
@@ -111,16 +65,36 @@ public class Particle<T> extends AbstractSolution<T> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Particle<?> particle = (Particle<?>) o;
+        Particle particle = (Particle) o;
         return id == particle.id;
     }
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Speed: ").append(speed).append("\n");
-        builder.append("Current Solution:\n").append(solution).append("\n");
-        builder.append("Best Solution:\n").append(bestSolution);
-        return builder.toString();
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    public RealVector getSolution() {
+        return solution;
+    }
+
+    public void setSolution(RealVector solution) {
+        this.solution = solution;
+    }
+
+    public RealVector getBestSolution() {
+        return bestSolution;
+    }
+
+    public void setBestSolution(RealVector bestSolution) {
+        this.bestSolution = bestSolution;
+    }
+
+    public RealVector getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(RealVector speed) {
+        this.speed = speed;
     }
 }

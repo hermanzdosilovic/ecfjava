@@ -6,9 +6,9 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.GeometricC
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.BitVectorStochasticMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
+import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.adapters.CopyOnMutationAdapter;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.MaxOnesProblem;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.SimpleSolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.BitVector;
 
 public final class MaxOnesSimpleSA {
@@ -26,8 +26,10 @@ public final class MaxOnesSimpleSA {
         final double  MUTATION_PROBABILITY = 0.0;
         final boolean FORCE_MUTATION       = true;
 
-        IProblem<BitVector>  problem  = new MaxOnesProblem<>();
-        IMutation<BitVector> mutation = new BitVectorStochasticMutation<>(MUTATION_PROBABILITY, FORCE_MUTATION);
+        IProblem<BitVector> problem = new MaxOnesProblem<>();
+        IMutation<BitVector> mutation = new CopyOnMutationAdapter(
+            new BitVectorStochasticMutation<>(MUTATION_PROBABILITY, FORCE_MUTATION)
+        );
 
         ICoolingSchedule outerCoolingSchedule = new GeometricCoolingSchedule(
             OUTER_ITERATIONS, OUTER_INITIAL_TEMP, OUTER_FINAL_TEMP
@@ -46,6 +48,6 @@ public final class MaxOnesSimpleSA {
             innerCoolingSchedule
         );
 
-        simulatedAnnealing.run(new SimpleSolution<>(new BitVector(NUMBER_OF_COMPONENTS)));
+        simulatedAnnealing.run(new BitVector(NUMBER_OF_COMPONENTS));
     }
 }

@@ -3,9 +3,10 @@ package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies.ITopology;
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSchedule;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particle;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
-public class ConstrictedPSO<T extends RealVector> extends AbstractBasicPSO<T> {
+public class ConstrictedPSO<T extends Particle> extends AbstractBasicPSO<T> {
 
     private ICoolingSchedule constrictedFactorSchedule;
 

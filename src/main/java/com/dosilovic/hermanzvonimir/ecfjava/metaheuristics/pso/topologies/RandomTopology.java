@@ -1,70 +1,67 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies;
 
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particle;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
-public class RandomTopology<T> implements ITopology<T> {
+public class RandomTopology<T extends ISolution> implements ITopology<T> {
 
-    private Map<Particle<T>, Collection<Particle<T>>> neighboursMap;
-    private double                                    neighborhoodProbability;
-    private boolean                                   forceNeighborhood;
+    private Map<T, Collection<T>> neighboursMap;
+    private double                neighborhoodProbability;
 
-    private static final Random RAND = new Random();
-
-    public RandomTopology(double neighborhoodProbability, boolean forceNeighborhood) {
-        this(null, neighborhoodProbability, forceNeighborhood);
+    public RandomTopology(double neighborhoodProbability) {
+        this(null, neighborhoodProbability);
     }
 
     public RandomTopology(
-        Collection<Particle<T>> particles,
-        double neighborhoodProbability,
-        boolean forceNeighborhood
+        Collection<T> population,
+        double neighborhoodProbability
     ) {
         this.neighborhoodProbability = neighborhoodProbability;
-        this.forceNeighborhood = forceNeighborhood;
 
-        if (particles != null) {
-            createNeighborhood(particles);
+        if (population != null) {
+            createNeighborhood(population);
         }
     }
 
     @Override
-    public Collection<Particle<T>> getNeighbours(Particle<T> particle) {
-        return neighboursMap.get(particle);
+    public Collection<T> getNeighbours(T individual) {
+        return neighboursMap.get(individual);
     }
 
     @Override
-    public void updateTopology(Collection<Particle<T>> particles) {
-        createNeighborhood(particles);
+    public void updateTopology(Collection<T> population) {
+        createNeighborhood(population);
     }
 
-    private void createNeighborhood(Collection<Particle<T>> particles) {
+    private void createNeighborhood(Collection<T> population) {
+        IRandom random = Random.getRandom();
+
         if (neighboursMap == null) {
             neighboursMap = new HashMap<>();
         } else {
             neighboursMap.clear();
         }
 
-        for (Particle<T> particle : particles) {
-            int index = RAND.nextInt(particles.size());
-            int i     = 0;
-
-            for (Particle<T> neighbour : particles) {
+        for (T individual : population) {
+            for (T neighbour : population) {
                 if (
-                    (forceNeighborhood && i == index) ||
-                    RAND.nextDouble() <= neighborhoodProbability ||
-                    particle.equals(neighbour)
+                    random.nextDouble() < neighborhoodProbability ||
+                    individual == neighbour
                     ) {
-                    connectNeighbours(particle, neighbour);
+                    connectNeighbours(individual, neighbour);
                 }
-                i++;
             }
         }
     }
 
-    private void connectNeighbours(Particle<T> first, Particle<T> second) {
-        Collection<Particle<T>> neighbours = neighboursMap.computeIfAbsent(first, k -> new HashSet<>());
+    private void connectNeighbours(T first, T second) {
+        Collection<T> neighbours = neighboursMap.computeIfAbsent(first, k -> new HashSet<>());
         neighbours.add(second);
 
         neighbours = neighboursMap.computeIfAbsent(second, k -> new HashSet<>());

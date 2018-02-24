@@ -1,26 +1,26 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.pso.topologies;
 
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particle;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
 import java.util.Collection;
 
-public class FullyConnectedTopology<T> implements ITopology<T> {
+public class FullyConnectedTopology<T extends ISolution> implements ITopology<T> {
 
-    private Collection<Particle<T>> particles;
+    private Collection<T> population;
 
     public FullyConnectedTopology() {}
 
-    public FullyConnectedTopology(Collection<Particle<T>> particles) {
-        this.particles = particles;
+    public FullyConnectedTopology(Collection<T> population) {
+        this.population = population;
     }
 
     @Override
-    public Collection<Particle<T>> getNeighbours(Particle<T> particle) {
-        return particles;
+    public Collection<T> getNeighbours(T individual) {
+        return population;
     }
 
     @Override
-    public void updateTopology(Collection<Particle<T>> particles) {
-        this.particles = particles;
+    public void updateTopology(Collection<T> population) {
+        this.population = population;
     }
 }

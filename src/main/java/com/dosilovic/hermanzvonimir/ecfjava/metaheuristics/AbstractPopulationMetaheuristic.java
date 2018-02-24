@@ -6,31 +6,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class AbstractPopulationMetaheuristic<T> extends AbstractMetaheuristic<T> implements IPopulationMetaheuristic<T> {
+public abstract class AbstractPopulationMetaheuristic<T extends ISolution> extends AbstractMetaheuristic<T> implements IPopulationMetaheuristic<T> {
 
-    protected Collection<ISolution<T>> initialPopulation;
-    protected List<ISolution<T>>       population;
+    protected List<T> initialPopulation;
+    protected List<T> population;
 
     @Override
-    public Collection<ISolution<T>> getInitialPopulation() {
+    public Collection<T> getInitialPopulation() {
         return initialPopulation;
     }
 
     @Override
-    public void setInitialPopulation(Collection<ISolution<T>> initialPopulation) {
+    public void setInitialPopulation(Collection<T> initialPopulation) {
         if (initialPopulation == null || initialPopulation.isEmpty()) {
             throw new IllegalArgumentException("Initial population cannot be null or empty");
         }
-        this.initialPopulation = initialPopulation;
+        this.initialPopulation = new ArrayList<>(initialPopulation);
     }
 
     @Override
-    public Collection<ISolution<T>> getPopulation() {
+    public Collection<T> getPopulation() {
         return population;
     }
 
     @Override
-    public void setPopulation(Collection<ISolution<T>> population) {
+    public void setPopulation(Collection<T> population) {
         if (population == null || population.isEmpty()) {
             throw new IllegalArgumentException("Population cannot be null or empty");
         }
@@ -38,7 +38,7 @@ public abstract class AbstractPopulationMetaheuristic<T> extends AbstractMetaheu
     }
 
     @Override
-    public ISolution<T> run(Collection<ISolution<T>> initialPopulation) {
+    public T run(Collection<T> initialPopulation) {
         setInitialPopulation(initialPopulation);
         return run();
     }

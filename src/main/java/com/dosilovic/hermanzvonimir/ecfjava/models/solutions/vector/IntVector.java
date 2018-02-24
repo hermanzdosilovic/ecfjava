@@ -1,73 +1,57 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector;
 
-import java.util.Random;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.AbstractSolution;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
-public class IntVector implements IVector<Integer> {
+import java.util.Arrays;
 
-    private int[]   components;
-    private boolean isBounded;
-    private int     minComponentValue;
-    private int     maxComponentValue;
+public class IntVector extends AbstractSolution implements IVector<Integer> {
 
-    private static final Random RAND = new Random();
+    private int[] data;
 
     public IntVector(int size) {
-        components = new int[size];
+        data = new int[size];
     }
 
-    public IntVector(int... ints) {
-        components = ints.clone();
-    }
-
-    public IntVector(IntVector intVector) {
-        this(intVector.components);
-        this.minComponentValue = intVector.minComponentValue;
-        this.maxComponentValue = intVector.maxComponentValue;
-        this.isBounded = intVector.isBounded;
-    }
-
-    public IntVector(int size, int minComponentValue, int maxComponentValue, boolean isBounded) {
+    public IntVector(int size, int value) {
         this(size);
-
-        if (minComponentValue > maxComponentValue) {
-            throw new IllegalArgumentException("Minimum component value cannot be greater than maximal component value");
-        }
-
         for (int i = 0; i < size; i++) {
-            components[i] = minComponentValue + RAND.nextInt(maxComponentValue - minComponentValue + 1);
+            data[i] = value;
         }
-
-        this.isBounded = isBounded;
-        this.minComponentValue = minComponentValue;
-        this.maxComponentValue = maxComponentValue;
     }
 
-    public IntVector(int size, int minComponentValue, int maxComponentValue) {
-        this(size, minComponentValue, maxComponentValue, false);
+    public IntVector(int[] data) {
+        this.data = data.clone();
     }
 
-    public IntVector(int size, int initialValue) {
-        this(size, initialValue, initialValue);
+    public IntVector(IntVector vector) {
+        this(vector.data);
+        setFitness(vector.getFitness());
+        setPenalty(vector.getPenalty());
     }
 
     @Override
     public Integer getValue(int index) {
-        return components[index];
+        return data[index];
     }
 
     @Override
     public void setValue(int index, Integer value) {
-        int boundedValue = value;
-        if (isBounded) {
-            boundedValue = Math.max(boundedValue, minComponentValue);
-            boundedValue = Math.min(boundedValue, maxComponentValue);
-        }
-        components[index] = boundedValue;
+        data[index] = value;
     }
 
     @Override
     public int getSize() {
-        return components.length;
+        return data.length;
+    }
+
+    @Override
+    public void randomizeValues() {
+        IRandom random = Random.getRandom();
+        for (int i = 0; i < data.length; i++) {
+            data[i] = random.nextInt();
+        }
     }
 
     @Override
@@ -75,20 +59,20 @@ public class IntVector implements IVector<Integer> {
         return new IntVector(this);
     }
 
-    public int[] toArray() {
-        return components.clone();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        IntVector that = (IntVector) o;
+        return Arrays.equals(data, that.data);
     }
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder("{ ");
-        for (int i = 0; i < components.length; i++) {
-            builder.append(components[i]);
-            if (i + 1 < components.length) {
-                builder.append("; ");
-            }
-        }
-        builder.append("}");
-        return builder.toString();
+    public int hashCode() {
+        return Arrays.hashCode(data);
     }
 }

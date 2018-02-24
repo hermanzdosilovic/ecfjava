@@ -1,10 +1,11 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.crossovers;
 
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 public class BLXAlphaCrossover<T extends RealVector> implements ICrossover<T> {
 
@@ -20,24 +21,20 @@ public class BLXAlphaCrossover<T extends RealVector> implements ICrossover<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Collection<ISolution<T>> cross(ISolution<T> mom, ISolution<T> dad) {
-        T momRepresentative = mom.getRepresentative();
-        T dadRepresentative = dad.getRepresentative();
+    public List<T> cross(T mom, T dad) {
+        IRandom random = Random.getRandom();
 
-        ISolution<T> child               = dad.copy();
-        T            childRepresentative = (T) dadRepresentative.copy();
+        T child = (T) dad.copy();
 
-        child.setRepresentative(childRepresentative);
-
-        double cmin, cmax, I;
-        for (int i = 0; i < childRepresentative.getSize(); i++) {
-            cmin = Math.min(momRepresentative.getValue(i), dadRepresentative.getValue(i));
-            cmax = Math.max(momRepresentative.getValue(i), dadRepresentative.getValue(i));
-            I = cmax - cmin;
-            childRepresentative.setEntry(i, (cmin - I * alpha) + RAND.nextDouble() * I * (1 + 2 * alpha));
+        double cmin, cmax, Ialpha;
+        for (int i = 0; i < child.getSize(); i++) {
+            cmin = Math.min(mom.getValue(i), dad.getValue(i));
+            cmax = Math.max(mom.getValue(i), dad.getValue(i));
+            Ialpha = (cmax - cmin) * alpha;
+            child.setValue(i, random.nextDouble(cmin - Ialpha, cmax + Ialpha));
         }
 
-        Collection<ISolution<T>> children = new ArrayList<>();
+        List<T> children = new ArrayList<>();
         children.add(child);
 
         return children;

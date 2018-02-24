@@ -16,6 +16,11 @@ public class SimpleRandom implements IRandom {
     }
 
     @Override
+    public double nextDouble(double bound) {
+        return nextDouble(0, bound);
+    }
+
+    @Override
     public double nextDouble(double min, double max) {
         return min + nextDouble() * (max - min);
     }
@@ -23,6 +28,10 @@ public class SimpleRandom implements IRandom {
     @Override
     public float nextFloat() {
         return random.nextFloat();
+    }
+
+    @Override public float nextFloat(float bound) {
+        return nextFloat(0, bound);
     }
 
     @Override

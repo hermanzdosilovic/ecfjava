@@ -8,15 +8,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractMetaheuristic<T> implements IMetaheuristic<T> {
+public abstract class AbstractMetaheuristic<T extends ISolution> implements IMetaheuristic<T> {
 
-    protected ISolution<T> bestSolution;
+    protected T bestSolution;
 
     protected AtomicBoolean isStopped = new AtomicBoolean();
 
     private Set<IObserver<T>> observers;
-
-    protected static final Random RAND = new Random();
 
     public AbstractMetaheuristic() {
         observers = new HashSet<>();
@@ -28,12 +26,12 @@ public abstract class AbstractMetaheuristic<T> implements IMetaheuristic<T> {
     }
 
     @Override
-    public ISolution<T> getBestSolution() {
+    public T getBestSolution() {
         return bestSolution;
     }
 
     @Override
-    public void setBestSolution(ISolution<T> bestSolution) {
+    public void setBestSolution(T bestSolution) {
         if (bestSolution == null) {
             throw new IllegalArgumentException("Best solution cannot be null");
         }

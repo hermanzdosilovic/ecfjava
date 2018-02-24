@@ -1,10 +1,12 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.selections;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
 import java.util.Collection;
 
-public class RouletteWheelSelection<T> implements ISelection<T> {
+public class RouletteWheelSelection<T extends ISolution> implements ISelection<T> {
 
     private boolean useFitness;
 
@@ -17,17 +19,19 @@ public class RouletteWheelSelection<T> implements ISelection<T> {
     }
 
     @Override
-    public ISolution<T> select(Collection<ISolution<T>> population) {
+    public T select(Collection<T> population) {
+        IRandom random = Random.getRandom();
+
         double fitnessSum = 0;
-        for (ISolution<T> individual : population) {
+        for (T individual : population) {
             fitnessSum += Math.abs(useFitness ? individual.getFitness() : individual.getPenalty());
         }
 
-        double       cumulativeFitness = 0;
-        double       randomDouble      = RAND.nextDouble();
-        ISolution<T> lastIndividual    = null;
+        double cumulativeFitness = 0;
+        double randomDouble      = random.nextDouble();
+        T      lastIndividual    = null;
 
-        for (ISolution<T> individual : population) {
+        for (T individual : population) {
             lastIndividual = individual;
             cumulativeFitness += Math.abs(useFitness ? individual.getFitness() : individual.getPenalty());
 

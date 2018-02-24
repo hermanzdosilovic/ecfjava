@@ -6,15 +6,13 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.util.Solutions;
+import jdk.jshell.spi.ExecutionControl;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-public abstract class AbstractOSGA<T> extends AbstractGA<T> {
+public abstract class AbstractOSGA<T extends ISolution> extends AbstractGA<T> {
 
     protected double           maxSelectionPressure;
     protected ICoolingSchedule successRatioSchedule;
@@ -23,9 +21,6 @@ public abstract class AbstractOSGA<T> extends AbstractGA<T> {
     protected double actualSelectionPressure;
     protected double comparisonFactor;
     protected double successRatio;
-
-    private Collection<ISolution<T>> successfulPopulation;
-    private List<ISolution<T>>       unsuccessfulPopulation;
 
     public AbstractOSGA(
         boolean useElitism,
@@ -58,7 +53,7 @@ public abstract class AbstractOSGA<T> extends AbstractGA<T> {
     }
 
     @Override
-    public ISolution<T> run() {
+    public T run() {
         long startTime = System.nanoTime();
 
         setPopulation(initialPopulation);
@@ -66,17 +61,23 @@ public abstract class AbstractOSGA<T> extends AbstractGA<T> {
         bestSolution = null;
 
         if (!evaluateEveryGeneration) {
-            Solutions.updateFitness(population, problem);
+            problem.updateFitness(population);
         }
 
         actualSelectionPressure = 0;
+
+        List<T> unsuccessfulPopulation = new ArrayList<>((int) (population.size() * (1 - successRatio)) + 1);
+        Set<T>  successfulPopulation   = new HashSet<>((int) (population.size() * successRatio) + 1);
+
+        List<T> nextPopulation = new ArrayList<>(population);
+        List<T> tmpPopulation;
 
         for (generation = 1; generation <= maxGenerations; generation++) {
             comparisonFactor = comparisonFactorSchedule.getTemperature(generation - 1);
             successRatio = successRatioSchedule.getTemperature(generation - 1);
 
             if (evaluateEveryGeneration) {
-                Solutions.updateFitness(population, problem);
+                problem.updateFitness(population);
             }
             setBestSolution(Solutions.findBestByFitness(population));
 
@@ -106,18 +107,23 @@ public abstract class AbstractOSGA<T> extends AbstractGA<T> {
                 break;
             }
 
-            unsuccessfulPopulation = new ArrayList<>((int) (population.size() * (1 - successRatio)) + 1);
-            successfulPopulation = createSuccessfulPopulation(unsuccessfulPopulation);
+            successfulPopulation.clear();
+            unsuccessfulPopulation.clear();
+            createSuccessfulPopulation(successfulPopulation, unsuccessfulPopulation);
 
             actualSelectionPressure =
                 (double) (successfulPopulation.size() + unsuccessfulPopulation.size()) / population.size();
+
+            createNextPopulation(nextPopulation, successfulPopulation, unsuccessfulPopulation);
+
+            tmpPopulation = population;
+            population = nextPopulation;
+            nextPopulation = tmpPopulation;
 
             if (actualSelectionPressure >= maxSelectionPressure) {
                 System.err.println("Max selection pressure reached.\n");
                 break;
             }
-
-            population = createNextPopulation();
 
             if (generation == maxGenerations) {
                 System.err.println("Max generations reached.");
@@ -125,7 +131,9 @@ public abstract class AbstractOSGA<T> extends AbstractGA<T> {
             }
         }
 
-        Solutions.updateFitness(population, problem);
+        if (evaluateEveryGeneration) {
+            problem.updateFitness(population);
+        }
         setBestSolution(Solutions.findBestByFitness(population));
 
         Duration duration = Duration.ofNanos(System.nanoTime() - startTime);
@@ -143,16 +151,18 @@ public abstract class AbstractOSGA<T> extends AbstractGA<T> {
         return bestSolution;
     }
 
-    protected abstract Collection<ISolution<T>> createSuccessfulPopulation(
-        List<ISolution<T>> unsuccessfulPopulation
+    protected abstract void createSuccessfulPopulation(
+        Set<T> successfulPopulation,
+        List<T> unsuccessfulPopulation
     );
 
-    protected abstract List<ISolution<T>> createNextPopulation(
-        Collection<ISolution<T>> successfulPopulation,
-        List<ISolution<T>> unsuccessfulPopulation
+    protected abstract void createNextPopulation(
+        List<T> nextPopulation,
+        Set<T> successfulPopulation,
+        List<T> unsuccessfulPopulation
     );
 
-    protected List<ISolution<T>> createNextPopulation() {
-        return createNextPopulation(successfulPopulation, unsuccessfulPopulation);
+    protected void createNextPopulation(List<T> nextPopulation) {
+        throw new UnsupportedOperationException();
     }
 }

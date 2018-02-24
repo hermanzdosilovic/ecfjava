@@ -2,11 +2,12 @@ package com.dosilovic.hermanzvonimir.ecfjava.models.mutations;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
+import java.util.List;
 import java.util.Random;
 
-public interface IMutation<T> {
+public interface IMutation<T extends ISolution> {
 
-    Random RAND = new Random();
+    T mutate(T child);
 
-    ISolution<T> mutate(ISolution<T> child);
+    List<T> mutate(List<T> children);
 }

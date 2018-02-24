@@ -1,12 +1,12 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.crossovers;
 
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.IVector;
 import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
 import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class ExponentialCrossover<T extends IVector> implements ICrossover<T> {
 
@@ -22,34 +22,26 @@ public class ExponentialCrossover<T extends IVector> implements ICrossover<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Collection<ISolution<T>> cross(ISolution<T> mom, ISolution<T> dad) {
+    public List<T> cross(T mom, T dad) {
         IRandom random = Random.getRandom();
 
-        T momRepresentative = mom.getRepresentative();
-        T dadRepresentative = dad.getRepresentative();
+        T alice = (T) mom.copy();
+        T bob   = (T) dad.copy();
 
-        ISolution<T> alice               = mom.copy();
-        ISolution<T> bob                 = dad.copy();
-        T            aliceRepresentative = (T) momRepresentative.copy();
-        T            bobRepresentative   = (T) dadRepresentative.copy();
+        int start = random.nextInt(dad.getSize());
+        alice.setValue(start, dad.getValue(start));
+        bob.setValue(start, mom.getValue(start));
 
-        alice.setRepresentative(aliceRepresentative);
-        bob.setRepresentative(bobRepresentative);
-
-        int start = random.nextInt(dadRepresentative.getSize());
-        aliceRepresentative.setValue(start, dadRepresentative.getValue(start));
-        bobRepresentative.setValue(start, momRepresentative.getValue(start));
-
-        for (int i = start + 1; i < momRepresentative.getSize(); i++) {
+        for (int i = start + 1; i < mom.getSize(); i++) {
             if (random.nextDouble() < crossoverProbability) {
-                aliceRepresentative.setValue(i, dadRepresentative.getValue(i));
-                bobRepresentative.setValue(i, momRepresentative.getValue(i));
+                alice.setValue(i, dad.getValue(i));
+                bob.setValue(i, mom.getValue(i));
             } else {
                 break;
             }
         }
 
-        Collection<ISolution<T>> children = new ArrayList<>();
+        List<T> children = new ArrayList<>();
         children.add(alice);
         children.add(bob);
 

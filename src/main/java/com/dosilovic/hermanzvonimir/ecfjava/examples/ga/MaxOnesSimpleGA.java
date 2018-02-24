@@ -11,16 +11,15 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.problems.MaxOnesProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.TournamentSelection;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.BitVectorFactory;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories.SimpleSolutionFactory;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.BitVector;
 
 public final class MaxOnesSimpleGA {
 
     public static void main(String[] args) {
-        final int     NUMBER_OF_COMPONENTS      = 400;
+        final int     NUMBER_OF_COMPONENTS      = 300;
         final int     POPULATION_SIZE           = 300;
         final boolean USE_ELITISM               = true;
-        final int     MAX_GENERATIONS           = 2000;
+        final int     MAX_GENERATIONS           = 1000;
         final boolean EVALUATE_EVERY_GENERATION = false;
         final double  DESIRED_FITNESS           = 1.0;
         final double  DESIRED_PRECISION         = 0;
@@ -47,9 +46,7 @@ public final class MaxOnesSimpleGA {
         );
 
         geneticAlgorithm.run(
-            new SimpleSolutionFactory<>(
-                new BitVectorFactory(new BitVector(NUMBER_OF_COMPONENTS))
-            ).createMultipleInstances(POPULATION_SIZE)
+            new BitVectorFactory(new BitVector(NUMBER_OF_COMPONENTS)).createMultipleInstances(POPULATION_SIZE)
         );
     }
 }

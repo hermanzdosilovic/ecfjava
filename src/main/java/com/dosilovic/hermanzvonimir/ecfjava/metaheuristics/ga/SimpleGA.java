@@ -5,13 +5,13 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.util.Solutions;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class SimpleGA<T> extends AbstractGA<T> {
+public class SimpleGA<T extends ISolution> extends AbstractGA<T> {
 
     public SimpleGA(
         boolean useElitism,
@@ -38,36 +38,26 @@ public class SimpleGA<T> extends AbstractGA<T> {
     }
 
     @Override
-    protected List<ISolution<T>> createNextPopulation() {
-        List<ISolution<T>> nextPopulation = new ArrayList<>(population.size());
-
+    protected void createNextPopulation(List<T> nextPopulation) {
         if (useElitism) {
-            nextPopulation.add(bestSolution);
-            nextPopulation.add(Solutions.findSecondBestByFitness(population));
+            nextPopulation.set(0, bestSolution);
+            nextPopulation.set(1, Solutions.findSecondBestByFitness(population));
         }
 
-        while (nextPopulation.size() < population.size()) {
-            ISolution<T> mom = selection.select(population);
-            ISolution<T> dad = selection.select(population);
-
-            Collection<ISolution<T>> children = crossover.cross(mom, dad);
+        for (int i = (useElitism ? 2 : 0); i < population.size(); i++) {
+            List<T> children = mutation.mutate(
+                crossover.cross(
+                    selection.select(population),
+                    selection.select(population)
+                )
+            );
 
             if (!evaluateEveryGeneration) {
-                List<ISolution<T>> mutatedChildren = new ArrayList<>(children.size());
-                for (ISolution<T> child : children) {
-                    mutatedChildren.add(mutation.mutate(child));
-                }
-
-                Solutions.updateFitness(mutatedChildren, problem);
-                nextPopulation.add(Solutions.findBestByFitness(mutatedChildren));
+                problem.updateFitness(children);
+                nextPopulation.set(i, Solutions.findBestByFitness(children));
             } else {
-                for (ISolution<T> child : children) {
-                    nextPopulation.add(mutation.mutate(child));
-                    break;
-                }
+                nextPopulation.set(i, children.get(0));
             }
         }
-
-        return nextPopulation;
     }
 }

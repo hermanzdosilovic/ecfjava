@@ -1,54 +1,33 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector;
 
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 import org.apache.commons.math3.linear.ArrayRealVector;
-
-import java.util.Random;
 
 public class RealVector extends ArrayRealVector implements IVector<Double> {
 
-    private boolean isBounded;
-    private double  minComponentValue;
-    private double  maxComponentValue;
-
-    private static final Random RAND = new Random();
+    private double fitness = -1.0 * Double.MAX_VALUE;
+    private double penalty = Double.MAX_VALUE;
 
     public RealVector(int size) {
         super(size);
     }
 
-    public RealVector(double... data) {
+    public RealVector(int size, double value) {
+        super(size);
+        for (int i = 0; i < size; i++) {
+            setValue(i, value);
+        }
+    }
+
+    public RealVector(double[] data) {
         super(data);
     }
 
-    public RealVector(RealVector realVector) {
-        super(realVector.toArray());
-        this.minComponentValue = realVector.minComponentValue;
-        this.maxComponentValue = realVector.maxComponentValue;
-        this.isBounded = realVector.isBounded;
-    }
-
-    public RealVector(int size, double minComponentValue, double maxComponentValue, boolean isBounded) {
-        this(size);
-
-        if (minComponentValue > maxComponentValue) {
-            throw new IllegalArgumentException("Minimum component value cannot be greater than maximal component value");
-        }
-
-        for (int i = 0; i < size; i++) {
-            setEntry(i, minComponentValue + RAND.nextDouble() * (maxComponentValue - minComponentValue));
-        }
-
-        this.isBounded = isBounded;
-        this.minComponentValue = minComponentValue;
-        this.maxComponentValue = maxComponentValue;
-    }
-
-    public RealVector(int size, double minComponentValue, double maxComponentValue) {
-        this(size, minComponentValue, maxComponentValue, false);
-    }
-
-    public RealVector(int size, double initialValue) {
-        this(size, initialValue, initialValue);
+    public RealVector(RealVector vector) {
+        super(vector.getDataRef());
+        setFitness(vector.getFitness());
+        setPenalty(vector.getPenalty());
     }
 
     @Override
@@ -58,17 +37,40 @@ public class RealVector extends ArrayRealVector implements IVector<Double> {
 
     @Override
     public void setValue(int index, Double value) {
-        double boundedValue = value;
-        if (isBounded) {
-            boundedValue = Math.max(boundedValue, minComponentValue);
-            boundedValue = Math.min(boundedValue, maxComponentValue);
-        }
-        setEntry(index, boundedValue);
+        setEntry(index, value);
     }
 
     @Override
     public int getSize() {
         return getDimension();
+    }
+
+    @Override
+    public void randomizeValues() {
+        IRandom random = Random.getRandom();
+        for (int i = 0, size = getSize(); i < size; i++) {
+            setEntry(i, random.nextDouble());
+        }
+    }
+
+    @Override
+    public double getFitness() {
+        return fitness;
+    }
+
+    @Override
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
+    @Override
+    public double getPenalty() {
+        return penalty;
+    }
+
+    @Override
+    public void setPenalty(double penalty) {
+        this.penalty = penalty;
     }
 
     @Override

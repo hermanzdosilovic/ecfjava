@@ -6,13 +6,14 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.selections.ISelection;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.util.Solutions;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public abstract class AbstractGA<T> extends AbstractPopulationMetaheuristic<T> implements IGeneticAlgorithm<T> {
+public abstract class AbstractGA<T extends ISolution> extends AbstractPopulationMetaheuristic<T> implements IGeneticAlgorithm<T> {
 
     protected boolean useElitism;
     protected int     maxGenerations;
@@ -50,7 +51,7 @@ public abstract class AbstractGA<T> extends AbstractPopulationMetaheuristic<T> i
     }
 
     @Override
-    public ISolution<T> run() {
+    public T run() {
         long startTime = System.nanoTime();
 
         setPopulation(initialPopulation);
@@ -58,13 +59,16 @@ public abstract class AbstractGA<T> extends AbstractPopulationMetaheuristic<T> i
         bestSolution = null;
 
         if (!evaluateEveryGeneration) {
-            Solutions.updateFitness(population, problem);
+            problem.updateFitness(population);
         }
+
+        List<T> nextPopulation = new ArrayList<>(population);
+        List<T> tmpPopulation;
 
         for (generation = 1; generation <= maxGenerations; generation++) {
 
             if (evaluateEveryGeneration) {
-                Solutions.updateFitness(population, problem);
+                problem.updateFitness(population);
             }
             setBestSolution(Solutions.findBestByFitness(population));
 
@@ -83,7 +87,11 @@ public abstract class AbstractGA<T> extends AbstractPopulationMetaheuristic<T> i
                 break;
             }
 
-            population = createNextPopulation();
+            createNextPopulation(nextPopulation);
+
+            tmpPopulation = population;
+            population = nextPopulation;
+            nextPopulation = tmpPopulation;
 
             if (generation == maxGenerations) {
                 System.err.println("Max generations reached.\n");
@@ -92,7 +100,7 @@ public abstract class AbstractGA<T> extends AbstractPopulationMetaheuristic<T> i
         }
 
         if (evaluateEveryGeneration) {
-            Solutions.updateFitness(population, problem);
+            problem.updateFitness(population);
         }
         setBestSolution(Solutions.findBestByFitness(population));
 
@@ -139,5 +147,5 @@ public abstract class AbstractGA<T> extends AbstractPopulationMetaheuristic<T> i
         this.maxGenerations = maxGenerations;
     }
 
-    protected abstract List<ISolution<T>> createNextPopulation();
+    protected abstract void createNextPopulation(List<T> nextPopulation);
 }

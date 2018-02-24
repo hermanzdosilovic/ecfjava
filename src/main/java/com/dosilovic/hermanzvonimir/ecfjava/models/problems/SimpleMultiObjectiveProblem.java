@@ -3,7 +3,7 @@ package com.dosilovic.hermanzvonimir.ecfjava.models.problems;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
-public class SimpleMultiObjectiveProblem<T> extends SingleObjectiveProblem<T> {
+public class SimpleMultiObjectiveProblem<T extends ISolution> extends SingleObjectiveProblem<T> {
 
     private IProblem<T>[]        problems;
     private UnivariateFunction[] functions;
@@ -29,7 +29,7 @@ public class SimpleMultiObjectiveProblem<T> extends SingleObjectiveProblem<T> {
     }
 
     @Override
-    public double fitness(ISolution<T> individual) {
+    public double fitness(T individual) {
         double fitness = 0;
 
         int offset = 0;
@@ -41,7 +41,7 @@ public class SimpleMultiObjectiveProblem<T> extends SingleObjectiveProblem<T> {
     }
 
     @Override
-    public double penalty(ISolution<T> individual) {
+    public double penalty(T individual) {
         double penalty = 0;
 
         int offset = 0;

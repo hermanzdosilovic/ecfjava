@@ -4,14 +4,14 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.RealVector;
 
 public class RealVectorFactory extends AbstractFactory<RealVector> {
 
-    private RealVector realVector;
+    private RealVector template;
 
-    public RealVectorFactory(RealVector realVector) {
-        this.realVector = new RealVector(realVector);
+    public RealVectorFactory(RealVector template) {
+        this.template = template;
     }
 
     @Override
     public RealVector createInstance() {
-        return realVector.copy();
+        return template.copy();
     }
 }

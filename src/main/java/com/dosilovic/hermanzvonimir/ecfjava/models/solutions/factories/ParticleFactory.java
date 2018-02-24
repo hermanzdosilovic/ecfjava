@@ -2,21 +2,16 @@ package com.dosilovic.hermanzvonimir.ecfjava.models.solutions.factories;
 
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.particle.Particle;
 
-public class ParticleFactory<T> extends AbstractSolutionFactory<T> {
+public class ParticleFactory extends AbstractFactory<Particle> {
 
-    private ISolutionFactory<T> initialSolutionFactory;
-    private RealVectorFactory   initialSpeedFactory;
+    private Particle template;
 
-    public ParticleFactory(
-        ISolutionFactory<T> initialSolutionFactory,
-        RealVectorFactory initialSpeedFactory
-    ) {
-        this.initialSolutionFactory = initialSolutionFactory;
-        this.initialSpeedFactory = initialSpeedFactory;
+    public ParticleFactory(Particle template) {
+        this.template = template;
     }
 
     @Override
-    public Particle<T> createInstance() {
-        return new Particle<>(initialSolutionFactory.createInstance(), initialSpeedFactory.createInstance());
+    public Particle createInstance() {
+        return template.copy();
     }
 }

@@ -5,9 +5,7 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import java.util.Collection;
 import java.util.Random;
 
-public interface ISelection<T> {
+public interface ISelection<T extends ISolution> {
 
-    Random RAND = new Random();
-
-    ISolution<T> select(Collection<ISolution<T>> population);
+    T select(Collection<T> population);
 }

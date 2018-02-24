@@ -4,12 +4,10 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSc
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
-import java.util.Random;
-
-public class SimpleSA<T> extends AbstractSA<T> {
-
-    private static final Random RAND = new Random();
+public class SimpleSA<T extends ISolution> extends AbstractSA<T> {
 
     public SimpleSA(
         double desiredPenalty,
@@ -30,24 +28,25 @@ public class SimpleSA<T> extends AbstractSA<T> {
     }
 
     @Override
-    protected ISolution<T> onOuterTemperatureStart(double outerTemperature) {
+    protected T onOuterTemperatureStart(double outerTemperature) {
         return solution;
     }
 
     @Override
-    protected ISolution<T> onInnerTemperatureStart(double outerTemperature, double innerTemperature) {
+    protected T onInnerTemperatureStart(double outerTemperature, double innerTemperature) {
         return solution;
     }
 
     @Override
-    protected ISolution<T> selectNextSolution(
-        ISolution<T> neighbourSolution, double outerTemperature, double innerTemperature
+    protected T selectNextSolution(
+        T neighbourSolution, double outerTemperature, double innerTemperature
     ) {
-        double penaltyDiff = neighbourSolution.getPenalty() - solution.getPenalty();
+        IRandom random      = Random.getRandom();
+        double  penaltyDiff = neighbourSolution.getPenalty() - solution.getPenalty();
 
-        if (penaltyDiff <= 0) {
+        if (Math.signum(penaltyDiff) != 1.0) {
             return neighbourSolution;
-        } else if (RAND.nextDouble() < Math.exp(-1.0 * penaltyDiff / outerTemperature)) {
+        } else if (random.nextDouble() < Math.exp(-1.0 * penaltyDiff / outerTemperature)) {
             return neighbourSolution;
         }
 

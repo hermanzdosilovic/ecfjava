@@ -1,9 +1,10 @@
 package com.dosilovic.hermanzvonimir.ecfjava.models.mutations;
 
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.BitVector;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.IRandom;
+import com.dosilovic.hermanzvonimir.ecfjava.util.random.Random;
 
-public class BitVectorStochasticMutation<T extends BitVector> implements IMutation<T> {
+public class BitVectorStochasticMutation<T extends BitVector> extends AbstractMutation<T> {
 
     private double  mutationProbability;
     private boolean forceMutation;
@@ -21,27 +22,22 @@ public class BitVectorStochasticMutation<T extends BitVector> implements IMutati
         this(0.5);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public ISolution<T> mutate(ISolution<T> child) {
-        T childRepresentative  = child.getRepresentative();
-        T mutantRepresentative = (T) childRepresentative.copy();
+    public T mutate(T child) {
+        IRandom random = Random.getRandom();
 
         boolean mutationHappened = false;
-        for (int i = 0; i < mutantRepresentative.getSize(); i++) {
-            if (RAND.nextDouble() < mutationProbability) {
+        for (int i = 0; i < child.getSize(); i++) {
+            if (random.nextDouble() < mutationProbability) {
                 mutationHappened = true;
-                mutantRepresentative.flip(i);
+                child.flip(i);
             }
         }
 
         if (!mutationHappened && forceMutation) {
-            mutantRepresentative.flip(RAND.nextInt(mutantRepresentative.getSize()));
+            child.flip(random.nextInt(child.getSize()));
         }
 
-        ISolution<T> mutant = child.copy();
-        mutant.setRepresentative(mutantRepresentative);
-
-        return mutant;
+        return child;
     }
 }

@@ -1,8 +1,9 @@
 package com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.util;
 
 import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.IMetaheuristic;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
 
-public interface IObserver<T> {
+public interface IObserver<T extends ISolution> {
 
-    public void update(IMetaheuristic<T> metaheuristic);
+    void update(IMetaheuristic<T> metaheuristic);
 }

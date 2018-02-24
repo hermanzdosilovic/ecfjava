@@ -5,12 +5,12 @@ import com.dosilovic.hermanzvonimir.ecfjava.metaheuristics.sa.cooling.ICoolingSc
 import com.dosilovic.hermanzvonimir.ecfjava.models.mutations.IMutation;
 import com.dosilovic.hermanzvonimir.ecfjava.models.problems.IProblem;
 import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.ISolution;
-import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.Solutions;
+import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.util.Solutions;
 
 import java.time.Duration;
 import java.util.Date;
 
-public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> implements ISimulatedAnnealing<T> {
+public abstract class AbstractSA<T extends ISolution> extends AbstractIndividualMetaheuristic<T> implements ISimulatedAnnealing<T> {
 
     protected IProblem<T>      problem;
     protected IMutation<T>     mutation;
@@ -36,7 +36,7 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
     }
 
     @Override
-    public ISolution<T> run() {
+    public T run() {
         long startTime = System.nanoTime();
 
         setSolution(initialSolution);
@@ -45,7 +45,7 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
 
         boolean innerStop = false;
 
-        solution.updatePenalty(problem);
+        problem.updatePenalty(solution);
 
         for (double outerTemperature : outerCoolingSchedule) {
             solution = onOuterTemperatureStart(outerTemperature);
@@ -68,8 +68,8 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
                     innerTemperature
                 );
 
-                ISolution<T> neighborSolution = mutation.mutate(solution);
-                neighborSolution.updatePenalty(problem);
+                T neighborSolution = mutation.mutate(solution);
+                problem.updatePenalty(neighborSolution);
 
                 solution = selectNextSolution(
                     neighborSolution,
@@ -77,6 +77,7 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
                     innerTemperature
                 );
 
+                // We don't want to notify observers in every iteration of inner cooling.
                 bestSolution = Solutions.betterByPenalty(bestSolution, solution);
 
                 if (Math.abs(bestSolution.getPenalty() - desiredPenalty) <= desiredPrecision) {
@@ -103,6 +104,8 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
             }
         }
 
+        setBestSolution(Solutions.betterByPenalty(bestSolution, solution));
+
         Duration duration = Duration.ofNanos(System.nanoTime() - startTime);
         System.err.printf(
             "Time: %02d:%02d:%02d.%03d\n\n",
@@ -118,11 +121,11 @@ public abstract class AbstractSA<T> extends AbstractIndividualMetaheuristic<T> i
         return bestSolution;
     }
 
-    protected abstract ISolution<T> onOuterTemperatureStart(double outerTemperature);
+    protected abstract T onOuterTemperatureStart(double outerTemperature);
 
-    protected abstract ISolution<T> onInnerTemperatureStart(double outerTemperature, double innerTemperature);
+    protected abstract T onInnerTemperatureStart(double outerTemperature, double innerTemperature);
 
-    protected abstract ISolution<T> selectNextSolution(
-        ISolution<T> nextSolution, double outerTemperature, double innerTemperature
+    protected abstract T selectNextSolution(
+        T neighborSolution, double outerTemperature, double innerTemperature
     );
 }

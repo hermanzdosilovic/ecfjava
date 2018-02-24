@@ -4,14 +4,14 @@ import com.dosilovic.hermanzvonimir.ecfjava.models.solutions.vector.BitVector;
 
 public class BitVectorFactory extends AbstractFactory<BitVector> {
 
-    private BitVector bitVector;
+    private BitVector template;
 
-    public BitVectorFactory(BitVector bitVector) {
-        this.bitVector = new BitVector(bitVector);
+    public BitVectorFactory(BitVector template) {
+        this.template = template;
     }
 
     @Override
     public BitVector createInstance() {
-        return bitVector.copy();
+        return template.copy();
     }
 }
