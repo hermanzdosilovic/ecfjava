@@ -46,7 +46,7 @@ public class SimpleRandom implements IRandom {
 
     @Override
     public int nextInt(int bound) {
-        return nextInt(0, bound);
+        return random.nextInt(bound);
     }
 
     @Override

@@ -148,7 +148,7 @@ public abstract class MultiObjectiveProblem<T extends RealVector> implements IPr
 //        return sorted;
 //    }
 //
-//    private double getDistance(ISolution<T> first, ISolution<T> second) {
+//    private double getLength(ISolution<T> first, ISolution<T> second) {
 //        RealVector a = first.getRepresentative();
 //        RealVector b = second.getRepresentative();
 //
@@ -157,13 +157,13 @@ public abstract class MultiObjectiveProblem<T extends RealVector> implements IPr
 //            b = getResult(second);
 //        }
 //
-//        return a.getDistance(b);
+//        return a.getLength(b);
 //    }
 //
 //    private double nicheDensity(ISolution<T> individual, Collection<? extends ISolution<T>> population) {
 //        double nc = 0;
 //        for (ISolution<T> neighbor : population) {
-//            double d = getDistance(individual, neighbor);
+//            double d = getLength(individual, neighbor);
 //            if (d < sigmaShare) {
 //                nc += 1 - Math.pow(d / sigmaShare, alpha);
 //            }
